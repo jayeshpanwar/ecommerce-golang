@@ -16,4 +16,5 @@ func SetupRoutes(router *gin.Engine) {
 	router.PUT("/products/:id/approve", controllers.ApproveProduct)
 	router.PUT("/products/:id/reject", controllers.RejectProduct)
 	router.GET("/shop/products", controllers.GetApprovedProducts)
+	router.POST("/cart/add", controllers.AddToCart)
 }
