@@ -66,7 +66,16 @@ func AddToCart(c *gin.Context) {
 	result := config.DB.Where("cart_id=? AND product_id=?", cart.ID, req.ProductID).First(&cartItem)
 
 	if result.Error == nil {
-		cartItem.Quantity += req.Quantity
+
+		newQuantity := cartItem.Quantity + req.Quantity
+
+		if newQuantity > uint(product.Stock) { //check stock availability
+			c.JSON(400, gin.H{
+				"message": "Insufficient stock",
+			})
+			return
+		}
+		cartItem.Quantity = newQuantity
 
 		config.DB.Save(&cartItem)
 		c.JSON(200, gin.H{
