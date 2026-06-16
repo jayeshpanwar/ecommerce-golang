@@ -33,8 +33,7 @@ func JWTMiddleware() gin.HandlerFunc {
 
 		token, err :=
 			utils.ValidateToken(
-				tokenString,
-			)
+				tokenString)
 
 		if err != nil || !token.Valid {
 
@@ -46,12 +45,12 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		claims :=
-			token.Claims.(jwt.MapClaims)
+		claims := token.Claims.(jwt.MapClaims)
+		userID := uint(claims["user_id"].(float64))
 
 		c.Set(
 			"userID",
-			claims["user_id"],
+			userID,
 		)
 
 		c.Set(

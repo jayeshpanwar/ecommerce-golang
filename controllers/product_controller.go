@@ -19,6 +19,9 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
+	userID := c.MustGet("userID").(uint)
+	product.SellerID = userID
+
 	product.Status = "pending"
 
 	if err := config.DB.Create(&product).Error; err != nil {
@@ -101,6 +104,15 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
+	userID := c.MustGet("userID").(uint)
+
+	if product.SellerID != userID {
+		c.JSON(403, gin.H{
+			"message": "Forbidden: You are not the owner of this product",
+		})
+		return
+	}
+
 	var input map[string]interface{}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -109,6 +121,10 @@ func UpdateProduct(c *gin.Context) {
 		})
 		return
 	}
+
+	delete(input, "seller_id")
+	delete(input, "status")
+	delete(input, "id")
 
 	if err := config.DB.Model(&product).Updates(input).Error; err != nil {
 		c.JSON(500, gin.H{
@@ -141,6 +157,15 @@ func DeleteProduct(c *gin.Context) {
 	if err != nil {
 		c.JSON(404, gin.H{
 			"error": "ID not exists",
+		})
+		return
+	}
+
+	userID := c.MustGet("userID").(uint)
+
+	if product.SellerID != userID {
+		c.JSON(403, gin.H{
+			"message": "Forbidden: You are not the owner of this product",
 		})
 		return
 	}
