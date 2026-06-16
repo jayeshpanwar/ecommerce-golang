@@ -13,8 +13,6 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/signup", controllers.Signup)
 	router.POST("/login", controllers.Login)
 
-	router.GET("/products", controllers.GetProducts)
-	router.GET("/products/:id", controllers.GetProductById)
 	router.GET("/shop/products", controllers.GetApprovedProducts)
 
 	// Seller Routes
@@ -27,6 +25,7 @@ func SetupRoutes(router *gin.Engine) {
 		seller.POST("/products", controllers.CreateProduct)
 		seller.PUT("/products/:id", controllers.UpdateProduct)
 		seller.DELETE("/products/:id", controllers.DeleteProduct)
+		seller.GET("/products", controllers.GetSellerProducts)
 	}
 
 	// Admin Routes
@@ -40,12 +39,31 @@ func SetupRoutes(router *gin.Engine) {
 		admin.PUT("/products/:id/reject", controllers.RejectProduct)
 	}
 
-	// Authenticated Routes
-	auth := router.Group("/")
-	auth.Use(middlewares.JWTMiddleware())
+	// Authenticated Routes (Role: user)
+	user := router.Group("/")
+	user.Use(
+		middlewares.JWTMiddleware(),
+		middlewares.RoleMiddleware("user"),
+	)
 	{
-		auth.POST("/cart/add", controllers.AddToCart)
-		auth.GET("/cart", controllers.ViewCart)
-		//auth.GET("/profile", controllers.Profile)
+		// User sees only approved products.
+		user.GET("/products", controllers.GetProducts)
+		user.GET("/products/:id", controllers.GetProductById)
+		user.POST("/cart/add", controllers.AddToCart)
+		user.GET("/cart", controllers.ViewCart)
+		//user.GET("/profile", controllers.Profile)
 	}
+
+	// Authenticated Routes (Role: seller) - for seller product management UI
+	sellerUser := router.Group("/")
+	sellerUser.Use(
+		middlewares.JWTMiddleware(),
+		middlewares.RoleMiddleware("seller"),
+	)
+	{
+		// Seller can manage products via CRUD under /seller group.
+		// No user-facing product listing needed here.
+		// Keeping empty to allow future seller-specific endpoints.
+	}
+
 }

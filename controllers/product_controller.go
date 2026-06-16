@@ -44,7 +44,7 @@ func GetProducts(c *gin.Context) {
 
 	var products []models.Product
 
-	if err := config.DB.Find(&products).Error; err != nil {
+	if err := config.DB.Where("status = ?", "approved").Find(&products).Error; err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
@@ -72,10 +72,9 @@ func GetProductById(c *gin.Context) {
 
 	var product models.Product
 
-	if err := config.DB.First(&product, id).Error; err != nil {
-
+	// Only expose approved products to users.
+	if err := config.DB.Where("id = ? AND status = ?", id, "approved").First(&product).Error; err != nil {
 		c.JSON(404, gin.H{
-
 			"error": "Product Not Found",
 		})
 		return
@@ -270,4 +269,24 @@ func GetApprovedProducts(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"data": products,
 	})
+}
+
+// -----------------------GET SELLER PRODUCTS---------------------------------------------
+func GetSellerProducts(c *gin.Context) {
+
+	userID := c.MustGet("userID").(uint)
+
+	var products []models.Product
+
+	if err := config.DB.Where("seller_id=?", userID).Find(&products).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"data": products,
+	})
+
 }

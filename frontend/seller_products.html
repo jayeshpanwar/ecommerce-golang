@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller - Products</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header-row">
+        <h2 style="margin: 0;">My Products</h2>
+        <div class="header-actions">
+          <button type="button" class="small" onclick="window.location.href='seller_products_form.html'">Add / Edit / Delete</button>
+          <button type="button" class="small" onclick="window.location.href='products.html'">User Products</button>
+        </div>
+      </div>
+
+      <p id="result" class="result" aria-live="polite"></p>
+
+      <div class="list" style="padding: 0;">
+        <div style="overflow-x:auto;">
+          <table class="table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>Product ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="productsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <a href="login.html" onclick="logout(event)">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+
+    function getToken() {
+      return localStorage.getItem('token');
+    }
+
+    function authHeaders() {
+      const token = getToken();
+      return {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      el.classList.remove('error', 'success');
+      if (type) el.classList.add(type);
+      el.innerText = message || '';
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('productsTbody').innerHTML = `
+        <tr><td colspan="5" class="muted" style="text-align:center;">${msg}</td></tr>
+      `;
+    }
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function fetchSellerProducts() {
+      const token = getToken();
+      if (!token) {
+        setResult('Please login first.', 'error');
+        renderEmpty('Login required.');
+        return;
+      }
+
+      try {
+        setResult('Loading your products...', null);
+        document.getElementById('productsTbody').innerHTML = `
+          <tr><td colspan="5" class="muted" style="text-align:center;">Loading...</td></tr>
+        `;
+
+        const res = await fetch(`${API_BASE}/seller/products`, {
+          method: 'GET',
+          headers: authHeaders(),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to fetch your products', 'error');
+          renderEmpty('Could not load products.');
+          return;
+        }
+
+        const products = data.data || [];
+        if (!Array.isArray(products) || products.length === 0) {
+          setResult('No products found.', 'success');
+          renderEmpty('You have not added any products yet.');
+          return;
+        }
+
+        const rows = products.map(p => {
+          return `
+            <tr>
+              <td>${p.id ?? p.ID ?? ''}</td>
+              <td>${p.name ?? p.Name ?? ''}</td>
+              <td>$${Number(p.price ?? p.Price ?? 0)}</td>
+              <td>${Number(p.stock ?? p.Stock ?? 0)}</td>
+              <td>${p.status ?? p.Status ?? ''}</td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('productsTbody').innerHTML = rows;
+        setResult(`Found ${products.length} product(s).`, 'success');
+      } catch (e) {
+        setResult('Network error while loading products.', 'error');
+        renderEmpty('Network error.');
+      }
+    }
+
+    // If user mistakenly opens seller page while not seller, redirect to user products.
+    (function redirectIfNotSeller() {
+      const token = getToken();
+      if (!token) return;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (payload && payload.role !== 'seller') {
+          window.location.href = 'products.html';
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+
+    fetchSellerProducts();
+
+    window.logout = logout;
+  </script>
+</body>
+</html>
+
