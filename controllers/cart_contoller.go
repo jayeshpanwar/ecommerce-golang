@@ -33,7 +33,6 @@ func AddToCart(c *gin.Context) {
 		})
 		return
 	}
-	userID := uint(1)
 
 	var cart models.Cart
 
@@ -47,6 +46,8 @@ func AddToCart(c *gin.Context) {
 	}
 
 	//------------Check Cart already available and create new if not------------------------------------------
+
+	userID := c.MustGet("userID").(uint)
 
 	if err := config.DB.Where("user_id=?", userID).First(&cart).Error; err != nil {
 		cart = models.Cart{
@@ -108,3 +109,67 @@ func AddToCart(c *gin.Context) {
 }
 
 //---------------------------DELETE SPECIFIC ITEM FROM CART--------------------------------------------------------
+
+// ---------------------------VIEW CART--------------------------------------------------------
+func ViewCart(c *gin.Context) {
+
+	userID := c.MustGet("userID").(uint)
+
+	var cart models.Cart
+
+	if err := config.DB.Where("user_id=?", userID).First(&cart).Error; err != nil {
+		c.JSON(400, gin.H{
+			"message": "Cart not found",
+		})
+		return
+	}
+
+	var cartItems []models.CartItem
+
+	if err := config.DB.
+		Where("cart_id = ?", cart.ID).
+		Find(&cartItems).Error; err != nil {
+
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	type CartItemResponse struct {
+		ProductID   uint    `json:"product_id"`
+		ProductName string  `json:"product_name"`
+		Price       float64 `json:"price"`
+		Quantity    uint    `json:"quantity"`
+	}
+
+	var response []CartItemResponse
+
+	for _, item := range cartItems {
+
+		var product models.Product
+
+		if err := config.DB.
+			First(&product, item.ProductID).
+			Error; err != nil {
+
+			continue
+		}
+
+		response = append(
+			response,
+			CartItemResponse{
+				ProductID:   product.ID,
+				ProductName: product.Name,
+				Price:       product.Price,
+				Quantity:    item.Quantity,
+			},
+		)
+	}
+
+	c.JSON(200, gin.H{
+		"cart_id": cart.ID,
+		"items":   response,
+	})
+}

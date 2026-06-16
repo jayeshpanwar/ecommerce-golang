@@ -9,29 +9,43 @@ import (
 
 func SetupRoutes(router *gin.Engine) {
 
-	router.POST("/products", controllers.CreateProduct)
-	router.GET("/products", controllers.GetProducts)
-	router.GET("/products/:id", controllers.GetProductById)
-	router.PUT("/products/:id", controllers.UpdateProduct)
-	router.DELETE("/products/:id", controllers.DeleteProduct)
-	router.PUT("/products/:id/approve", controllers.ApproveProduct)
-	router.PUT("/products/:id/reject", controllers.RejectProduct)
-	router.GET("/shop/products", controllers.GetApprovedProducts)
-	router.POST("/cart/add", controllers.AddToCart)
+	// Public Routes
 	router.POST("/signup", controllers.Signup)
 	router.POST("/login", controllers.Login)
-	router.GET(
-		"/profile",
+
+	router.GET("/products", controllers.GetProducts)
+	router.GET("/products/:id", controllers.GetProductById)
+	router.GET("/shop/products", controllers.GetApprovedProducts)
+
+	// Seller Routes
+	seller := router.Group("/seller")
+	seller.Use(
 		middlewares.JWTMiddleware(),
-		func(c *gin.Context) {
-
-			userID, _ := c.Get("userID")
-			role, _ := c.Get("role")
-
-			c.JSON(200, gin.H{
-				"user_id": userID,
-				"role":    role,
-			})
-		},
+		middlewares.RoleMiddleware("seller"),
 	)
+	{
+		seller.POST("/products", controllers.CreateProduct)
+		seller.PUT("/products/:id", controllers.UpdateProduct)
+		seller.DELETE("/products/:id", controllers.DeleteProduct)
+	}
+
+	// Admin Routes
+	admin := router.Group("/admin")
+	admin.Use(
+		middlewares.JWTMiddleware(),
+		middlewares.RoleMiddleware("admin"),
+	)
+	{
+		admin.PUT("/products/:id/approve", controllers.ApproveProduct)
+		admin.PUT("/products/:id/reject", controllers.RejectProduct)
+	}
+
+	// Authenticated Routes
+	auth := router.Group("/")
+	auth.Use(middlewares.JWTMiddleware())
+	{
+		auth.POST("/cart/add", controllers.AddToCart)
+		auth.GET("/cart", controllers.ViewCart)
+		//auth.GET("/profile", controllers.Profile)
+	}
 }
