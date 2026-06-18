@@ -3,26 +3,100 @@ package controllers
 import (
 	"ecommerce/config"
 	"ecommerce/models"
+	"ecommerce/utils"
+	"fmt"
+	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreateProduct(c *gin.Context) {
 
-	var product models.Product
+	name := c.PostForm("name")
+	description := c.PostForm("description")
 
-	if err := c.ShouldBindJSON(&product); err != nil {
+	price, err := strconv.ParseFloat(
+		c.PostForm("price"),
+		64,
+	)
+	if err != nil {
 		c.JSON(400, gin.H{
-			"error": err.Error(),
+			"error": "Invalid price",
 		})
 		return
 	}
 
+	stock, err := strconv.Atoi(
+		c.PostForm("stock"),
+	)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid stock",
+		})
+		return
+	}
 	userID := c.MustGet("userID").(uint)
-	product.SellerID = userID
 
-	product.Status = "pending"
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Image is required",
+		})
+		return
+	}
+
+	allowedTypes := map[string]bool{
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
+	}
+
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+
+	if !allowedTypes[ext] {
+		c.JSON(400, gin.H{
+			"error": "Only JPG, JPEG and PNG files are allowed",
+		})
+		return
+	}
+
+	if file.Size > 5*1024*1024 {
+		c.JSON(400, gin.H{
+			"error": "Image size must be less than 5 MB",
+		})
+		return
+	}
+	fileName := fmt.Sprintf(
+		"%d_%s",
+		time.Now().Unix(),
+		file.Filename,
+	)
+
+	filePath := "./uploads/" + fileName
+
+	if err := c.SaveUploadedFile(
+		file,
+		filePath,
+	); err != nil {
+
+		c.JSON(500, gin.H{
+			"error": "Failed to save image",
+		})
+		return
+	}
+
+	product := models.Product{
+		Name:        name,
+		Description: description,
+		Price:       price,
+		Stock:       stock,
+		SellerID:    userID,
+		Status:      "pending",
+		ImageURL:    "/uploads/" + fileName,
+	}
 
 	if err := config.DB.Create(&product).Error; err != nil {
 		c.JSON(500, gin.H{
@@ -51,14 +125,26 @@ func GetProducts(c *gin.Context) {
 		return
 	}
 
+	var response []utils.ProductResponse
+
+	for _, product := range products {
+
+		response = append(
+			response,
+			utils.BuildProductResponse(
+				product,
+			),
+		)
+	}
+
 	c.JSON(200, gin.H{
 		"message": "Products fetched successfully",
-		"data":    products,
+		"data":    response,
 	})
 
 }
 
-//---------------------------------------------------------------------------------
+//----------------------------------GetProductByID-----------------------------------------
 
 func GetProductById(c *gin.Context) {
 
@@ -80,9 +166,11 @@ func GetProductById(c *gin.Context) {
 		return
 	}
 
+	response := utils.BuildProductResponse(product)
+
 	c.JSON(200, gin.H{
 		"message": "Product fetched by ID",
-		"data":    product,
+		"data":    response,
 	})
 
 }
@@ -266,8 +354,17 @@ func GetApprovedProducts(c *gin.Context) {
 		return
 	}
 
+	var response []utils.ProductResponse
+
+	for _, product := range products {
+		response = append(
+			response,
+			utils.BuildProductResponse(product),
+		)
+	}
+
 	c.JSON(200, gin.H{
-		"data": products,
+		"data": response,
 	})
 }
 
@@ -285,8 +382,17 @@ func GetSellerProducts(c *gin.Context) {
 		return
 	}
 
+	var response []utils.ProductResponse
+
+	for _, product := range products {
+		response = append(
+			response,
+			utils.BuildProductResponse(product),
+		)
+	}
+
 	c.JSON(200, gin.H{
-		"data": products,
+		"data": response,
 	})
 
 }
@@ -303,7 +409,16 @@ func GetPendingSellerProducts(c *gin.Context) {
 		return
 	}
 
+	var response []utils.ProductResponse
+
+	for _, product := range products {
+		response = append(
+			response,
+			utils.BuildProductResponse(product),
+		)
+	}
+
 	c.JSON(200, gin.H{
-		"data": products,
+		"data": response,
 	})
 }

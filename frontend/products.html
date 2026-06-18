@@ -5,12 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Marketplace - ShopSphere</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- Overriding Styles to Fix Card Awkwardness --- */
+    .marketplace-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      padding: 20px 0;
+    }
+
+    .custom-product-card {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .custom-product-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary, #6366f1);
+    }
+
+    .custom-visual-pane {
+      height: 220px;
+      width: 100%;
+      position: relative;
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .custom-product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .custom-fallback-box {
+      width: 48px;
+      height: 48px;
+      opacity: 0.2;
+      color: #fff;
+    }
+
+    .custom-details-pane {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .custom-product-title {
+      margin: 0 0 8px 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .custom-pricing-row {
+      margin-bottom: 20px;
+    }
+
+    .custom-price-val {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary, #a78bfa);
+    }
+
+    .custom-actions-wrapper {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    .custom-submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary, #6366f1);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .custom-submit-btn:hover:not(:disabled) {
+      background: #4f46e5;
+    }
+
+    .custom-submit-btn:disabled {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.3);
+      cursor: not-allowed;
+    }
+
+    .custom-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-danger {
+      background: rgba(244, 63, 94, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+  </style>
 </head>
 <body>
-  <!-- Animated Ambient Blur Layer -->
   <div class="ambient-bg"></div>
 
-  <!-- E-commerce Storefront Header Navigation -->
   <nav class="navbar">
     <div class="nav-container">
       <div class="brand-logo-group">
@@ -35,7 +166,6 @@
       </div>
     </nav>
 
-    <!-- Main Storefront Layout -->
     <main class="storefront-container">
       <div class="storefront-header">
         <div>
@@ -50,31 +180,24 @@
         </div>
       </div>
 
-      <!-- Action feedback alert component -->
       <p id="result" class="result" aria-live="polite"></p>
 
-      <!-- Grid Injector System -->
-      <div id="productsList" class="grid marketplace-grid" aria-live="polite"></div>
+      <div id="productsList" class="marketplace-grid" aria-live="polite"></div>
     </main>
 
   <script src="app.js"></script>
   <script>
     const API_BASE = 'http://localhost:8080';
 
-    function getToken() {
-      return localStorage.getItem('token');
-    }
-
+    function getToken() { return localStorage.getItem('token'); }
     function authHeaders() {
       const token = getToken();
-      return {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      };
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
     }
 
     function setResult(message, type) {
       const el = document.getElementById('result');
+      if (!el) return;
       el.classList.remove('error', 'success');
       if (type) el.classList.add(type);
       el.innerText = message || '';
@@ -84,8 +207,8 @@
       const list = document.getElementById('productsList');
       if (isLoading) {
         list.innerHTML = `
-          <div class="loading-skeleton-wrapper">
-            <div class="spinner"></div>
+          <div class="loading-skeleton-wrapper" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <div class="spinner" style="margin: 0 auto 12px;"></div>
             <p class="muted">Querying active catalog items...</p>
           </div>
         `;
@@ -109,19 +232,11 @@
 
         setLoading(true);
 
-        const res = await fetch(`${API_BASE}/products`, {
-          method: 'GET',
-          headers: authHeaders(),
-        });
-
+        const res = await fetch(`${API_BASE}/products`, { method: 'GET', headers: authHeaders() });
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          // Token missing/invalid -> backend returns 401
-          if (res.status === 401) {
-            clearAuthAndRedirectToLogin();
-            return;
-          }
+          if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
           setResult(data.message || data.error || 'Failed to fetch products', 'error');
           return;
         }
@@ -132,11 +247,12 @@
           name: p.name ?? p.Name,
           price: p.price ?? p.Price,
           stock: p.stock ?? p.Stock,
+          imageUrl: p.image_url ?? p.imageUrl ?? p.ImageURL ?? '',
         }));
 
-        if (!Array.isArray(normalized) || normalized.length === 0) {
+        if (normalized.length === 0) {
           setResult('Products fetched, but list is empty.', 'error');
-          document.getElementById('productsList').innerHTML = '<p class="muted">No products available currently.</p>';
+          document.getElementById('productsList').innerHTML = '<p class="muted" style="grid-column: 1 / -1; text-align: center;">No products available currently.</p>';
           return;
         }
 
@@ -145,26 +261,29 @@
           const name = p.name;
           const price = p.price;
           const stock = p.stock;
-          const isOutOfStock = stock && Number(stock) <= 0;
+          const isOutOfStock = stock !== undefined && Number(stock) <= 0;
 
+          // Uses custom encapsulated class namespaces to completely prevent old layout rules leaking in
           return `
-            <div class="product-card ${isOutOfStock ? 'out-of-stock-card' : ''}">
-              <div class="product-visual-pane">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="fallback-box">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9" />
-                </svg>
-                ${isOutOfStock ? 
-                  `<span class="stock-badge stock-danger">Sold Out</span>` : 
-                  `<span class="stock-badge stock-success">${stock} units left</span>`
+            <div class="custom-product-card">
+              <div class="custom-visual-pane">
+                ${p.imageUrl ? 
+                  `<img class="custom-product-image" src="${p.imageUrl}" alt="${name ?? 'Product image'}" loading="lazy" onerror="this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke-width=\'1.2\' stroke=\'currentColor\' class=\'custom-fallback-box\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9\' /></svg>'" />` :
+                  `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="custom-fallback-box">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9" />
+                  </svg>`
                 }
+                <span class="custom-badge ${isOutOfStock ? 'badge-danger' : 'badge-success'}">
+                  ${isOutOfStock ? 'Sold Out' : `${stock} units left`}
+                </span>
               </div>
-              <div class="product-details-pane">
-                <h3>${name ?? 'Premium Merchandise'}</h3>
-                <div class="pricing-row">
-                  <span class="price-val">$${Number(price ?? 0).toFixed(2)}</span>
+              <div class="custom-details-pane">
+                <h3 class="custom-product-title" title="${name}">${name ?? 'Premium Merchandise'}</h3>
+                <div class="custom-pricing-row">
+                  <span class="custom-price-val">$${Number(price ?? 0).toFixed(2)}</span>
                 </div>
-                <div class="actions">
-                  <button type="button" class="add-to-cart-action" onclick="addToCart(${id})" ${isOutOfStock ? 'disabled' : ''}>
+                <div class="custom-actions-wrapper">
+                  <button type="button" class="custom-submit-btn" onclick="addToCart(${id})" ${isOutOfStock ? 'disabled' : ''}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     <span>${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
                   </button>
@@ -177,17 +296,13 @@
         document.getElementById('productsList').innerHTML = html;
       } catch (e) {
         console.error(e);
-        setResult('Network error while fetching products. Open console for details.', 'error');
+        setResult('Network error while fetching products.', 'error');
       }
     }
 
     async function addToCart(productId) {
       const token = getToken();
-      if (!token) {
-        setResult('Please login first.', 'error');
-        window.location.href = 'login.html';
-        return;
-      }
+      if (!token) { setResult('Please login first.', 'error'); window.location.href = 'login.html'; return; }
 
       const res = await fetch(`${API_BASE}/cart/add`, {
         method: 'POST',
@@ -198,10 +313,7 @@
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        if (res.status === 401) {
-          clearAuthAndRedirectToLogin();
-          return;
-        }
+        if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
         setResult(data.message || data.error || 'Failed to add to cart', 'error');
         return;
       }
@@ -220,10 +332,7 @@
       if (!token) return;
       try {
         const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-        const role = payload && payload.role;
-        if (role === 'seller') {
-          window.location.href = 'seller_products.html';
-        }
+        if (payload && payload.role === 'seller') { window.location.href = 'seller_products.html'; }
       } catch (e) {}
     })();
 
