@@ -290,3 +290,20 @@ func GetSellerProducts(c *gin.Context) {
 	})
 
 }
+
+// -----------------------GET PENDING PRODUCTS (ADMIN)---------------------------------
+func GetPendingSellerProducts(c *gin.Context) {
+
+	var products []models.Product
+
+	if err := config.DB.Where("status = ?", "pending").Find(&products).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"data": products,
+	})
+}

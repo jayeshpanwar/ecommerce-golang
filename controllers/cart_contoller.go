@@ -3,6 +3,7 @@ package controllers
 import (
 	"ecommerce/config"
 	"ecommerce/models"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -110,6 +111,41 @@ func AddToCart(c *gin.Context) {
 
 //---------------------------DELETE SPECIFIC ITEM FROM CART--------------------------------------------------------
 
+func DeleteFromCart(c *gin.Context) {
+
+	cartItemID := c.Param("id")
+	userID := c.MustGet("userID").(uint)
+
+	var cart models.Cart
+
+	if err := config.DB.Where("user_id=?", userID).First(&cart).Error; err != nil {
+		c.JSON(400, gin.H{
+			"message": "Cart not found",
+		})
+		return
+	}
+
+	var cartItem models.CartItem
+
+	if err := config.DB.Where("id=? AND cart_id=?", cartItemID, cart.ID).First(&cartItem).Error; err != nil {
+		c.JSON(400, gin.H{
+			"message": "Cart item not found",
+		})
+		return
+	}
+
+	if err := config.DB.Delete(&cartItem).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Cart item deleted",
+	})
+}
+
 // ---------------------------VIEW CART--------------------------------------------------------
 func ViewCart(c *gin.Context) {
 
@@ -138,6 +174,7 @@ func ViewCart(c *gin.Context) {
 	}
 
 	type CartItemResponse struct {
+		CartItemID  uint    `json:"cart_item_id"`
 		ProductID   uint    `json:"product_id"`
 		ProductName string  `json:"product_name"`
 		Price       float64 `json:"price"`
@@ -160,6 +197,8 @@ func ViewCart(c *gin.Context) {
 		response = append(
 			response,
 			CartItemResponse{
+
+				CartItemID:  item.ID,
 				ProductID:   product.ID,
 				ProductName: product.Name,
 				Price:       product.Price,
@@ -172,4 +211,58 @@ func ViewCart(c *gin.Context) {
 		"cart_id": cart.ID,
 		"items":   response,
 	})
+}
+
+// /-------------------------DECREASE QUANTITY OF ITEM IN CART--------------------------------------------------------
+func DecreaseCartItemQuantity(c *gin.Context) {
+
+	cartItemID := c.Param("id")
+	userID := c.MustGet("userID").(uint)
+
+	var cart models.Cart
+
+	if err := config.DB.Where("user_id=?", userID).First(&cart).Error; err != nil {
+		c.JSON(400, gin.H{
+			"message": "Cart not found",
+		})
+		return
+	}
+
+	var cartItem models.CartItem
+
+	fmt.Println("Cart Item ID:", cartItemID)
+	fmt.Println("Cart ID:", cart.ID)
+
+	if err := config.DB.Where("id=? AND cart_id=?", cartItemID, cart.ID).First(&cartItem).Error; err != nil {
+		c.JSON(400, gin.H{
+			"message": "Cart item not found",
+		})
+		return
+	}
+	fmt.Println("Found Cart Item:", cartItem)
+	fmt.Println("Quantity:", cartItem.Quantity)
+
+	if cartItem.Quantity > 1 {
+		cartItem.Quantity -= 1
+		if err := config.DB.Save(&cartItem).Error; err != nil {
+			c.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(200, gin.H{
+			"message": "Cart item quantity decreased",
+			"cart":    cartItem,
+		})
+	} else {
+		if err := config.DB.Delete(&cartItem).Error; err != nil {
+			c.JSON(500, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(200, gin.H{
+			"message": "Cart item removed",
+		})
+	}
 }

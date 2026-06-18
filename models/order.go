@@ -6,6 +6,10 @@ type Order struct {
 	gorm.Model
 
 	UserID      uint
-	TotalAmount uint
+	TotalAmount float64
 	Status      string
+
+	OrderItems []OrderItem
+
+	User User
 }

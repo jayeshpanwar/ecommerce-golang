@@ -8,5 +8,10 @@ type OrderItem struct {
 	OrderID   uint
 	ProductID uint
 	Quantity  uint
-	Price     float32
+	Price     float64
+
+	Product  Product
+	Order    Order
+	SellerID uint
+	Status   string
 }

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Approvals - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- Admin Dashboard Layout & Table Stylings --- */
+    .table-responsive-wrapper {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .admin-table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 16px 18px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .admin-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admin-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .desc-cell {
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted) !important;
+    }
+
+    /* Inline Action Controls Group */
+    .action-cell-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-cell-group button {
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 8px;
+      height: auto;
+      width: auto;
+    }
+
+    .btn-approve {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .btn-approve:hover {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-reject {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+    .btn-reject:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .status-badge-pending {
+      background: rgba(245, 158, 11, 0.12);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere <span style="font-size: 0.75rem; color: #a855f7; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 4px;">Management</span></span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn secondary-btn" onclick="fetchPending()">
+          🔄 Refresh Queue
+        </button>
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">
+          View Storefront
+        </button>
+        <button type="button" class="nav-btn secondary-btn" onclick="logout(event)" style="color: var(--danger) !important;">
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="storefront-container" style="max-width: 1100px;">
+    <div class="storefront-header">
+      <h2>Product Moderation Queue</h2>
+    </div>
+
+    <p id="result" class="result" aria-live="polite"></p>
+
+    <div class="table-responsive-wrapper">
+      <div style="overflow-x: auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Seller</th>
+              <th>Product Name</th>
+              <th>Description Summary</th>
+              <th>Unit Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th style="text-align: center;">Moderation Verdict</th>
+            </tr>
+          </thead>
+          <tbody id="pendingTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() {
+      const token = getToken();
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('pendingTbody').innerHTML = `
+        <tr><td colspan="8" class="muted" style="text-align:center; padding: 40px; font-style: italic;">${msg}</td></tr>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function fetchPending() {
+      const token = getToken();
+      if (!token) {
+        setResult('Login required.', 'error');
+        renderEmpty('Please sign in as admin.');
+        return;
+      }
+
+      try {
+        setResult('', null);
+        document.getElementById('pendingTbody').innerHTML = `
+          <tr><td colspan="8" class="muted" style="text-align:center; padding: 40px;"><div class="spinner" style="margin: 0 auto 10px;"></div>Syncing clearance database...</td></tr>
+        `;
+
+        const res = await fetch(`${API_BASE}/admin/products/pending`, { method: 'GET', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to fetch pending products', 'error');
+          renderEmpty('Could not synchronize verification tables.');
+          return;
+        }
+
+        const products = data.data || [];
+        if (!Array.isArray(products) || products.length === 0) {
+          setResult('Queue clear. No objects pending evaluation.', 'success');
+          renderEmpty('No products require validation at this time.');
+          return;
+        }
+
+        const rows = products.map(p => {
+          const id = p.id ?? p.ID ?? '';
+          const sellerId = p.seller_id ?? p.SellerID ?? '';
+          const name = escapeHtml(p.name ?? p.Name ?? 'Unnamed Product');
+          const description = escapeHtml(p.description ?? p.Description ?? 'No text provided.');
+          const price = Number(p.price ?? p.Price ?? 0).toFixed(2);
+          const stock = Number(p.stock ?? p.Stock ?? 0);
+          const status = p.status ?? p.Status ?? 'pending';
+
+          return `
+            <tr>
+              <td><span style="font-family: monospace; color: var(--muted);">#${id}</span></td>
+              <td><span style="font-family: monospace;">USR-${sellerId}</span></td>
+              <td style="font-weight: 600; color: #fff;">${name}</td>
+              <td class="desc-cell" title="${description}">${description}</td>
+              <td style="font-weight: 700; color: #fff;">$${price}</td>
+              <td>${stock} u</td>
+              <td><span class="status-badge-pending">${escapeHtml(status)}</span></td>
+              <td>
+                <div class="action-cell-group">
+                  <button type="button" class="btn-approve" onclick="approve(${id})">Approve</button>
+                  <button type="button" class="btn-reject" onclick="reject(${id})">Reject</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('pendingTbody').innerHTML = rows;
+      } catch (e) {
+        setResult('Network disconnect while fetching pending indexes.', 'error');
+        renderEmpty('Network connection failure.');
+      }
+    }
+
+    async function approve(id) { await moderate(id, 'approve'); }
+    async function reject(id) { await moderate(id, 'reject'); }
+
+    async function moderate(id, action) {
+      if (!getToken()) { setResult('Authentication expired.', 'error'); return; }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/products/${id}/${action}`, { method: 'PUT', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setResult(data.message || data.error || `Failed to process ${action}`, 'error');
+          return;
+        }
+
+        setResult(data.message || `Product #${id} updated successfully.`, 'success');
+        fetchPending();
+      } catch (e) {
+        setResult('Network execution failure during evaluation submit.', 'error');
+      }
+    }
+
+    // Security token validation routine
+    (function redirectIfNotAdmin() {
+      const token = getToken();
+      if (!token) return;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (payload && payload.role !== 'admin') { window.location.href = 'products.html'; }
+      } catch (_) {}
+    })();
+
+    fetchPending();
+
+    window.fetchPending = fetchPending;
+    window.approve = approve;
+    window.reject = reject;
+    window.logout = logout;
+  </script>
+</body>
+</html>

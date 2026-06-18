@@ -1,173 +1,464 @@
-:root{
-  --bg: #0b1220;
-  --card: #111b2f;
-  --text: #e7eefc;
-  --muted: rgba(231,238,252,0.7);
-  --primary: #4f8cff;
-  --danger: #ff4f6d;
-  --success: #2fe39b;
-  --border: rgba(231,238,252,0.12);
+/* ==========================================================================
+   1. ROOT VARIABLES & GLOBAL RESET
+   ========================================================================== */
+:root {
+  --bg: #070a13;
+  --card: rgba(15, 23, 42, 0.65);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.35);
+  --accent: #a855f7;
+  --danger: #f43f5e;
+  --success: #10b981;
+  --input-focus: rgba(99, 102, 241, 0.2);
+  --font-stack: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-*{ box-sizing: border-box; }
+* { 
+  box-sizing: border-box; 
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-body{
+body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  background: radial-gradient(1200px 600px at 20% 0%, rgba(79,140,255,0.25), transparent 55%),
-              radial-gradient(800px 500px at 90% 20%, rgba(47,227,155,0.18), transparent 60%),
-              var(--bg);
+  font-family: var(--font-stack);
+  background-color: var(--bg);
   color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
 }
 
-.container{
-  min-height: 100vh;
+/* ==========================================================================
+   2. AMBIENT BACKGROUND & ANIMATIONS
+   ========================================================================== */
+.ambient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 85% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+  filter: blur(40px);
+  animation: pulseAmbient 12s ease-in-out infinite alternate;
+}
+
+@keyframes pulseAmbient {
+  0% { transform: scale(1) translate(0px, 0px); }
+  100% { transform: scale(1.08) translate(10px, -20px); }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================================================
+   3. E-COMMERCE STICKY NAVBAR UI
+   ========================================================================== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(11, 18, 32, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--card-border);
+  padding: 14px 24px;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.small-logo {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 8px !important;
+  margin-bottom: 0 !important;
+  box-shadow: 0 4px 10px var(--primary-glow) !important;
+}
+
+.small-logo svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.nav-brand-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #ffffff, var(--muted));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* --- Rigid Context Sizing Rule for Nav Buttons (Overrides Global 100% width) --- */
+.navbar .nav-btn {
+  width: max-content !important;
+  min-width: auto !important;
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  height: 38px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: none !important;
+}
+
+.navbar .primary-btn { 
+  background: linear-gradient(90deg, var(--primary), var(--accent)) !important; 
+  border: 0 !important;
+}
+
+.navbar .secondary-btn { 
+  background: rgba(255, 255, 255, 0.06) !important; 
+  border: 1px solid var(--card-border) !important; 
+  color: var(--text) !important;
+}
+.navbar .secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.nav-icon {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+  display: inline-block;
+}
+
+/* ==========================================================================
+   4. LAYOUT SPACES & CORE PANELS
+   ========================================================================== */
+.container { 
+  min-height: 100vh; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 40px 24px; 
+}
+
+.card-wrapper { 
+  width: 100%; 
+  max-width: 440px; 
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+}
+
+.card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.storefront-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.storefront-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+/* Dynamic header buttons sizing override */
+.storefront-header button {
+  width: max-content !important;
+  min-width: auto !important;
+  margin-top: 0 !important;
+  padding: 10px 20px !important;
+}
+
+.brand-header { text-align: center; margin-bottom: 24px; }
+.brand-logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 8px 20px var(--primary-glow); }
+.brand-logo svg { width: 24px; height: 24px; color: white; }
+.brand-subtitle { color: var(--muted); font-size: 0.9rem; margin: 6px 0 0; }
+
+h2 { margin: 0; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.025em; background: linear-gradient(to right, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ==========================================================================
+   5. INTERACTIVES, FORMS & COMPACT OVERRIDES
+   ========================================================================== */
+.input-group { margin-bottom: 18px; width: 100%; }
+label { display: block; margin-bottom: 6px; color: #e2e8f0; font-size: 0.85rem; font-weight: 600; }
+input, select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--card-border); background: rgba(15, 23, 42, 0.5); color: var(--text); font-size: 0.95rem; outline: none; }
+input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--input-focus); background: rgba(15, 23, 42, 0.8); }
+
+/* Standard Forms Button Configuration */
+button {
+  width: auto; 
+  padding: 13px 20px; 
+  border: 0; 
+  border-radius: 10px; 
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  color: white; 
+  font-weight: 700; 
+  font-size: 0.95rem;
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px;
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+button:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+button:active { transform: translateY(0); }
+button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none !important; }
+
+/* Forces primary action buttons inside authentication cards to look compact and centered */
+.card button[type="submit"] {
+  width: auto !important;
+  min-width: 190px !important;
+  max-width: 240px !important;
+  padding: 0 24px !important;
+  font-size: 0.95rem !important;
+  height: 46px !important;
+  margin: 20px auto 4px auto !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  gap: 10px !important;
+}
+
+/* Ensure the text wrapper inside the button doesn't force a block wrap */
+.card button[type="submit"] span {
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+
+/* Keeps the arrow icon cleanly proportioned next to the text */
+.card button[type="submit"] .btn-icon {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+  display: inline-block !important;
+}
+
+/* ==========================================================================
+   6. MARKETPLACE CATALOG GRID & PRODUCTS
+   ========================================================================== */
+.grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+  gap: 24px; 
+  margin-top: 20px; 
+}
+
+.product-card { 
+  border: 1px solid var(--card-border); 
+  border-radius: 16px; 
+  padding: 0; 
+  background: rgba(15, 23, 42, 0.45); 
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.product-card:hover { 
+  transform: translateY(-6px); 
+  border-color: rgba(99, 102, 241, 0.35); 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.product-visual-pane {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.8));
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  position: relative;
+  border-bottom: 1px solid var(--card-border);
 }
 
-.card{
-  width: 100%;
-  max-width: 420px;
-  padding: 22px 20px;
-  border: 1px solid var(--border);
-  background: rgba(17,27,47,0.75);
-  backdrop-filter: blur(8px);
-  border-radius: 14px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+.fallback-box { width: 44px; height: 44px; color: rgba(255, 255, 255, 0.06); }
+.product-card:hover .fallback-box { transform: scale(1.1) rotate(3deg); color: rgba(99, 102, 241, 0.15); }
+
+.stock-badge { position: absolute; top: 12px; right: 12px; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 30px; }
+.stock-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+.stock-danger { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); }
+
+.product-details-pane { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+.product-details-pane h3 { margin: 0 0 10px; font-size: 1.1rem; font-weight: 700; line-height: 1.4; color: #f1f5f9; }
+
+.pricing-row { margin-bottom: 18px; }
+.price-val { font-size: 1.35rem; font-weight: 800; color: #fff; }
+
+.out-of-stock-card { opacity: 0.65; }
+.out-of-stock-card:hover { transform: none; box-shadow: none; border-color: var(--card-border); }
+.out-of-stock-card .add-to-cart-action { background: rgba(255, 255, 255, 0.05) !important; color: var(--muted) !important; border: 1px solid var(--card-border); }
+
+/* ==========================================================================
+   7. SHOPPING BAG / CART STRUCTURE & INTERFACES
+   ========================================================================== */
+.marketplace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 850px;
+  margin: 0 auto;
 }
 
-h2{ margin: 0 0 16px; font-weight: 700; }
-
-label{
-  display: block;
-  margin-top: 12px;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-size: 0.95rem;
+/* Fixes full-width checkout banner at the top of your cart page */
+#checkoutBtn, .checkout-now-btn, button[onclick*="checkout"], button[onclick*="Checkout"] {
+  width: 100% !important;
+  display: flex !important;
+  margin-bottom: 20px;
 }
 
-input, select{
-  width: 100%;
-  padding: 11px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(11,18,32,0.55);
-  color: var(--text);
-  outline: none;
+/* Structural wrapper enforcing inline layout for individual item blocks */
+.cart-row, [id^="cart-item"], .cart-item {
+  display: flex !important;
+  flex-direction: row !important; 
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 20px 24px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  margin-bottom: 14px;
+  gap: 16px;
 }
 
-input::placeholder{ color: rgba(231,238,252,0.45); }
-
-button{
-  margin-top: 16px;
-  width: 100%;
-  padding: 12px;
-  border: 0;
-  border-radius: 10px;
-  background: linear-gradient(90deg, var(--primary), #7a5cff);
-  color: white;
+.item-info .item-name {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
   font-weight: 700;
-  cursor: pointer;
+  color: #fff;
 }
-
-button:disabled{
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.small{
-  width: auto;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-}
-
-.header-row{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.header-actions{ display: flex; gap: 10px; }
-
-.grid{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
-  margin-top: 14px;
-}
-
-.product-card{
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  background: rgba(11,18,32,0.35);
-}
-
-.product-card h3{ margin: 0 0 8px; font-size: 1.05rem; }
-
-.meta{ color: var(--muted); margin: 6px 0; }
-
-.actions{ margin-top: 12px; }
-
-.list{ display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
-
-.cart-row{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(11,18,32,0.35);
-}
-
-.item-name{ margin: 0 0 6px; font-size: 1.05rem; }
-
-.qty-controls{ display: flex; align-items: center; gap: 10px; }
-
-.qty-btn{
-  width: 40px;
-  padding: 10px 0;
-  border-radius: 10px;
-}
-
-.qty{
-  min-width: 28px;
-  text-align: center;
-  font-weight: 800;
-}
-
-.footer-links{
-  margin-top: 14px;
-  font-size: 0.95rem;
-}
-
-.footer-links a{ color: var(--primary); text-decoration: none; }
-.footer-links a:hover{ text-decoration: underline; }
-
-.muted{ color: var(--muted); }
-
-.result{
-
-  margin: 14px 0 0;
-  min-height: 1.2em;
+.item-info .meta {
+  margin: 0;
+  font-size: 0.88rem;
   color: var(--muted);
 }
 
-.result.error{ color: var(--danger); }
-.result.success{ color: var(--success); }
-
-.links{
-  margin-top: 14px;
-  font-size: 0.95rem;
+.qty-controls {
+  display: flex !important;
+  flex-direction: row !important; 
+  align-items: center !important;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.links a{ color: var(--primary); text-decoration: none; }
-.links a:hover{ text-decoration: underline; }
+/* Strict layout scaling rules specifically for buttons inside any cart container */
+.cart-row button, .cart-item button, [id^="cart-item"] button, .qty-controls button {
+  width: max-content !important;
+  min-width: auto !important;
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  font-size: 0.88rem !important;
+  display: inline-flex !important;
+  height: 36px;
+  box-shadow: none !important;
+}
 
+.qty-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text) !important;
+  border-radius: 8px;
+}
+.qty-btn:hover {
+  background: var(--primary) !important;
+  border-color: transparent !important;
+}
+
+.qty {
+  font-weight: 700;
+  font-size: 1.05rem;
+  min-width: 24px;
+  text-align: center;
+  color: #fff;
+  display: inline-block;
+}
+
+.delete-btn, button[onclick*="remove"], button[onclick*="delete"] {
+  background: rgba(244, 63, 94, 0.1) !important;
+  color: var(--danger) !important;
+  border: 1px solid rgba(244, 63, 94, 0.2) !important;
+  border-radius: 8px;
+}
+.delete-btn:hover, button[onclick*="remove"]:hover, button[onclick*="delete"]:hover {
+  background: var(--danger) !important;
+  color: white !important;
+  border-color: transparent !important;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px;
+  color: var(--muted);
+  font-size: 1rem;
+  border: 1px dashed var(--card-border);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.2);
+}
+
+/* ==========================================================================
+   8. FEEDBACK, ALERTS & LOGOUT INTERFACES
+   ========================================================================== */
+.result { margin-top: 0; margin-bottom: 24px; padding: 12px; border-radius: 10px; text-align: center; display: none; font-size: 0.92rem; font-weight: 600; }
+.result:not(:empty) { display: block; animation: slideUpFade 0.25s ease; }
+.result.error { color: var(--danger); background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.15); }
+.result.success { color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.15); }
+
+.logout-wrapper { display: inline-block; }
+.logout-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(255, 24, 24, 0.02);
+}
+.logout-link:hover { color: var(--danger); background: rgba(244, 63, 94, 0.08); }
+
+.links { margin-top: 20px; text-align: center; font-size: 0.9rem; }
+.links a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+.loading-skeleton-wrapper { grid-column: 1 / -1; text-align: center; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.spinner { width: 28px; height: 28px; border: 3px solid rgba(255, 255, 255, 0.05); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

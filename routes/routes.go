@@ -12,6 +12,7 @@ func SetupRoutes(router *gin.Engine) {
 	// Public Routes
 	router.POST("/signup", controllers.Signup)
 	router.POST("/login", controllers.Login)
+	router.GET("/products", controllers.GetProducts)
 
 	router.GET("/shop/products", controllers.GetApprovedProducts)
 
@@ -26,6 +27,11 @@ func SetupRoutes(router *gin.Engine) {
 		seller.PUT("/products/:id", controllers.UpdateProduct)
 		seller.DELETE("/products/:id", controllers.DeleteProduct)
 		seller.GET("/products", controllers.GetSellerProducts)
+		seller.GET("/orders", controllers.GetSellerOrders)
+		seller.PUT("/orders/:id/accept", controllers.AcceptOrder)
+		seller.PUT("/orders/:id/reject", controllers.RejectOrder)
+		seller.PUT("/orders/:id/ship", controllers.ShipOrder)
+		seller.PUT("/orders/:id/deliver", controllers.DeliverOrder)
 	}
 
 	// Admin Routes
@@ -35,6 +41,7 @@ func SetupRoutes(router *gin.Engine) {
 		middlewares.RoleMiddleware("admin"),
 	)
 	{
+		admin.GET("/products/pending", controllers.GetPendingSellerProducts)
 		admin.PUT("/products/:id/approve", controllers.ApproveProduct)
 		admin.PUT("/products/:id/reject", controllers.RejectProduct)
 	}
@@ -47,10 +54,16 @@ func SetupRoutes(router *gin.Engine) {
 	)
 	{
 		// User sees only approved products.
-		user.GET("/products", controllers.GetProducts)
+
 		user.GET("/products/:id", controllers.GetProductById)
 		user.POST("/cart/add", controllers.AddToCart)
 		user.GET("/cart", controllers.ViewCart)
+		user.PUT("/cart/items/:id/decrease", controllers.DecreaseCartItemQuantity)
+		user.DELETE("/cart/items/:id", controllers.DeleteFromCart)
+		user.GET("/checkout/summary", controllers.Checkout)
+		user.POST("/orders", controllers.CreateOrder)
+		user.GET("/orders", controllers.ViewOrders)
+
 		//user.GET("/profile", controllers.Profile)
 	}
 

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Orders - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .table-responsive-wrapper {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    .orders-table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 16px 20px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .orders-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .orders-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .orders-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .status-pending { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .status-accepted { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.22); }
+    .status-shipped { background: rgba(168, 85, 247, 0.12); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.22); }
+    .status-delivered { background: rgba(16, 185, 129, 0.12); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-default { background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid var(--card-border); }
+
+    .order-id-txt {
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .action-cell-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: 10px;
+      height: auto;
+      width: auto;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+
+    .btn-action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-accept { border-color: rgba(59, 130, 246, 0.3); }
+    .btn-ship { border-color: rgba(168, 85, 247, 0.3); }
+    .btn-deliver { border-color: rgba(16, 185, 129, 0.3); }
+
+    .muted {
+      color: var(--muted) !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere <span style="font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 4px;">Seller</span></span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='seller_products.html'">← Back</button>
+        <button type="button" class="nav-btn secondary-btn" onclick="logout(event)" style="color: var(--danger) !important;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="storefront-container">
+    <div class="storefront-header">
+      <h2>Orders You Received</h2>
+      <p class="muted" style="margin-top: 6px;">Mark items as accepted / shipped / delivered.</p>
+    </div>
+
+    <p id="result" class="result" aria-live="polite"></p>
+
+    <div class="table-responsive-wrapper">
+      <div style="overflow-x: auto;">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Ordered At</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() {
+      const token = getToken();
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('ordersTbody').innerHTML = `
+        <tr><td colspan="8" class="muted" style="text-align:center; padding: 40px; font-style: italic;">${msg}</td></tr>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '<')
+        .replaceAll('>', '>')
+        .replaceAll('"', '"')
+        .replaceAll("'", '&#039;');
+     }
+
+
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function formatDate(dt) {
+      try {
+        const d = new Date(dt);
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'});
+      } catch (_) {
+        return String(dt ?? '');
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      const s = String(status ?? '').toLowerCase();
+      if (s.includes('pending')) return 'status-pending';
+      if (s.includes('accept')) return 'status-accepted';
+      if (s.includes('ship')) return 'status-shipped';
+      if (s.includes('deliver')) return 'status-delivered';
+      if (s.includes('approved')) return 'status-accepted';
+      return 'status-default';
+    }
+
+    // Added "isQuietRefresh" parameter so it doesn't flash the loading spinner when accepting/rejecting
+    async function fetchSellerOrders(isQuietRefresh = false) {
+      const token = getToken();
+      if (!token) {
+        setResult('Please login first.', 'error');
+        renderEmpty('Login required.');
+        return;
+      }
+
+      try {
+        setResult('', null);
+        
+        // Only show the big loading spinner on the initial load, not on background refreshes
+        if (!isQuietRefresh) {
+            document.getElementById('ordersTbody').innerHTML = `
+              <tr><td colspan="8" class="muted" style="text-align:center; padding: 40px;">
+                <div class="spinner" style="margin: 0 auto 10px;"></div>
+                Loading orders...
+              </td></tr>
+            `;
+        }
+
+        const res = await fetch(`${API_BASE}/seller/orders`, { method: 'GET', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to fetch seller orders', 'error');
+          renderEmpty('Could not load orders.');
+          return;
+        }
+
+        const orders = data.data || [];
+        if (!Array.isArray(orders) || orders.length === 0) {
+          renderEmpty('No orders yet.');
+          return;
+        }
+
+        const rows = orders.map(o => {
+          const orderId = o.order_id ?? o.OrderID ?? '';
+          const productName = o.product_name ?? o.ProductName ?? 'Product';
+          const customerName = o.customer_name ?? o.CustomerName ?? '';
+          const customerEmail = o.customer_email ?? o.CustomerEmail ?? '';
+          const qty = Number(o.quantity ?? o.Quantity ?? 0);
+          const price = Number(o.price ?? o.Price ?? 0).toFixed(2);
+          const orderedAt = o.ordered_at ?? o.OrderedAt ?? '';
+          const status = o.order_status ?? o.OrderStatus ?? 'pending';
+
+          const statusLower = String(status ?? '').toLowerCase();
+          const canAccept = statusLower === 'pending';
+
+          const canShip = statusLower === 'accepted';
+          const canDeliver = statusLower === 'shipped';
+
+          const orderItemId = o.id ?? o.order_item_id ?? o.OrderItemID ?? '';
+
+
+          // I've explicitly added type="button" to these action buttons
+          return `
+            <tr>
+              <td><span class="order-id-txt">#${escapeHtml(orderId)}</span></td>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${escapeHtml(customerName)}</div>
+                <div class="muted" style="font-size: 0.85rem;">${escapeHtml(customerEmail)}</div>
+              </td>
+              <td>
+                <div style="font-weight: 700; color: #fff;">${escapeHtml(productName)}</div>
+              </td>
+              <td>${qty}</td>
+              <td>$${price}</td>
+              <td>${escapeHtml(formatDate(orderedAt))}</td>
+              <td><span class="status-badge ${getStatusBadgeClass(status)}">${escapeHtml(status)}</span></td>
+              <td>
+                <div class="action-cell-group">
+                  <button type="button" class="btn-action btn-accept" onclick="acceptOrder('${escapeHtml(orderItemId)}')" ${canAccept ? '' : 'disabled'}>Accept</button>
+                  <button type="button" class="btn-action btn-accept" onclick="rejectOrder('${escapeHtml(orderItemId)}')" ${canAccept ? '' : 'disabled'} style="border-color: rgba(244, 63, 94, 0.3);">Reject</button>
+                  <button type="button" class="btn-action btn-ship" onclick="shipOrder('${escapeHtml(orderItemId)}')" ${canShip ? '' : 'disabled'}>Shipped</button>
+                  <button type="button" class="btn-action btn-deliver" onclick="deliverOrder('${escapeHtml(orderItemId)}')" ${canDeliver ? '' : 'disabled'}>Delivered</button>
+                </div>
+
+              </td>
+
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('ordersTbody').innerHTML = rows;
+      } catch (e) {
+        console.error(e);
+        setResult('Network error while loading seller orders.', 'error');
+        renderEmpty('Network error.');
+      }
+    }
+
+    async function acceptOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/accept`, {
+          method: 'PUT',
+          headers: authHeaders(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to accept order', 'error');
+          return;
+        }
+        setResult(data.message || 'Order accepted', 'success');
+        
+        // Pass "true" to refresh the data WITHOUT flashing the loading spinner
+        await fetchSellerOrders(true);
+      } catch (e) {
+        setResult('Network error while accepting order.', 'error');
+      }
+    }
+
+    async function rejectOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/reject`, {
+          method: 'PUT',
+          headers: authHeaders(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to reject order', 'error');
+          return;
+        }
+        setResult(data.message || 'Order rejected', 'success');
+        
+        // Pass "true" to refresh the data WITHOUT flashing the loading spinner
+        await fetchSellerOrders(true);
+      } catch (e) {
+        setResult('Network error while rejecting order.', 'error');
+      }
+    }
+
+    async function shipOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/ship`, {
+          method: 'PUT',
+          headers: authHeaders(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to mark shipped', 'error');
+          return;
+        }
+        setResult(data.message || 'Order shipped', 'success');
+        await fetchSellerOrders(true);
+      } catch (e) {
+        setResult('Network error while marking shipped.', 'error');
+      }
+    }
+
+    async function deliverOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/deliver`, {
+          method: 'PUT',
+          headers: authHeaders(),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to mark delivered', 'error');
+          return;
+        }
+        setResult(data.message || 'Order delivered', 'success');
+        await fetchSellerOrders(true);
+      } catch (e) {
+        setResult('Network error while marking delivered.', 'error');
+      }
+    }
+
+    // Initial page load triggers normally
+    fetchSellerOrders();
+    window.fetchSellerOrders = fetchSellerOrders;
+    window.acceptOrder = acceptOrder;
+    window.rejectOrder = rejectOrder;
+    window.shipOrder = shipOrder;
+    window.deliverOrder = deliverOrder;
+    window.logout = logout;
+
+  </script>
+</body>
+</html>

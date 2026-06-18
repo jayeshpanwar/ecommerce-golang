@@ -3,30 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Products</title>
+  <title>Marketplace - ShopSphere</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <div class="header-row">
-        <h2 style="margin: 0;">Products</h2>
-        <div class="header-actions">
-          <button type="button" class="small" onclick="window.location.href='cart.html'">Go to Cart</button>
+  <!-- Animated Ambient Blur Layer -->
+  <div class="ambient-bg"></div>
 
+  <!-- E-commerce Storefront Header Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere</span>
+      </div>
 
+      <div class="nav-actions">
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='orders.html'">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.793 1.993 1.821m-9.3 15.39c-1.118-.094-1.964-1.057-1.964-2.192V6.108c0-1.135.846-2.098 1.964-2.192m11.123 18V21a3 3 0 0 0-3-3H9.75a3 3 0 0 0-3 3v.75m11.25 0v-4.66a2.25 2.25 0 0 0-.659-1.591L15 14.25M9.75 21v-4.66a2.25 2.25 0 0 1 .659-1.591L12 14.25" /></svg>
+          <span>My Orders</span>
+        </button>
+        
+        <button type="button" class="nav-btn primary-btn" onclick="window.location.href='cart.html'">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
+          <span>Go to Cart</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Storefront Layout -->
+    <main class="storefront-container">
+      <div class="storefront-header">
+        <div>
+          <h2>Trending Catalog</h2>
+          <p class="brand-subtitle">Explore top-tier verified items active on the network.</p>
+        </div>
+        <div class="logout-wrapper">
+          <a href="login.html" onclick="logout(event)" class="logout-link">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
+            <span>Logout</span>
+          </a>
         </div>
       </div>
 
+      <!-- Action feedback alert component -->
       <p id="result" class="result" aria-live="polite"></p>
 
-      <div id="productsList" class="grid" aria-live="polite"></div>
-
-      <div class="footer-links">
-        <a href="login.html" onclick="logout(event)">Logout</a>
-      </div>
-    </div>
-  </div>
+      <!-- Grid Injector System -->
+      <div id="productsList" class="grid marketplace-grid" aria-live="polite"></div>
+    </main>
 
   <script src="app.js"></script>
   <script>
@@ -54,8 +83,18 @@
     function setLoading(isLoading) {
       const list = document.getElementById('productsList');
       if (isLoading) {
-        list.innerHTML = '<p class="muted">Loading products...</p>';
+        list.innerHTML = `
+          <div class="loading-skeleton-wrapper">
+            <div class="spinner"></div>
+            <p class="muted">Querying active catalog items...</p>
+          </div>
+        `;
       }
+    }
+
+    function clearAuthAndRedirectToLogin() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
     }
 
     async function fetchProducts() {
@@ -64,6 +103,7 @@
         const token = getToken();
         if (!token) {
           setResult('Please login first.', 'error');
+          window.location.href = 'login.html';
           return;
         }
 
@@ -77,12 +117,16 @@
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
+          // Token missing/invalid -> backend returns 401
+          if (res.status === 401) {
+            clearAuthAndRedirectToLogin();
+            return;
+          }
           setResult(data.message || data.error || 'Failed to fetch products', 'error');
           return;
         }
 
         const products = data.data || data || [];
-        // Backend returns products with capitalized fields; normalize.
         const normalized = (Array.isArray(products) ? products : []).map(p => ({
           id: p.id ?? p.ID,
           name: p.name ?? p.Name,
@@ -92,44 +136,56 @@
 
         if (!Array.isArray(normalized) || normalized.length === 0) {
           setResult('Products fetched, but list is empty.', 'error');
-          document.getElementById('productsList').innerHTML = '<p class="muted">No products available.</p>';
+          document.getElementById('productsList').innerHTML = '<p class="muted">No products available currently.</p>';
           return;
         }
-
-        setResult(`Products loaded: ${normalized.length}`, 'success');
 
         const html = normalized.map(p => {
           const id = p.id;
           const name = p.name;
           const price = p.price;
           const stock = p.stock;
-
+          const isOutOfStock = stock && Number(stock) <= 0;
 
           return `
-            <div class="product-card">
-              <h3>${name ?? 'Product'}</h3>
-              <p class="meta">Price: <b>$${Number(price ?? 0)}</b></p>
-              <p class="meta">Stock: <b>${Number(stock ?? 0)}</b></p>
-              <div class="actions">
-                <button type="button" onclick="addToCart(${id})" ${stock && Number(stock) <= 0 ? 'disabled' : ''}>Add to Cart</button>
+            <div class="product-card ${isOutOfStock ? 'out-of-stock-card' : ''}">
+              <div class="product-visual-pane">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="fallback-box">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9" />
+                </svg>
+                ${isOutOfStock ? 
+                  `<span class="stock-badge stock-danger">Sold Out</span>` : 
+                  `<span class="stock-badge stock-success">${stock} units left</span>`
+                }
+              </div>
+              <div class="product-details-pane">
+                <h3>${name ?? 'Premium Merchandise'}</h3>
+                <div class="pricing-row">
+                  <span class="price-val">$${Number(price ?? 0).toFixed(2)}</span>
+                </div>
+                <div class="actions">
+                  <button type="button" class="add-to-cart-action" onclick="addToCart(${id})" ${isOutOfStock ? 'disabled' : ''}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    <span>${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
+                  </button>
+                </div>
               </div>
             </div>
           `;
         }).join('');
 
         document.getElementById('productsList').innerHTML = html;
-        setResult('Products loaded.', 'success');
       } catch (e) {
         console.error(e);
         setResult('Network error while fetching products. Open console for details.', 'error');
       }
-
     }
 
     async function addToCart(productId) {
       const token = getToken();
       if (!token) {
         setResult('Please login first.', 'error');
+        window.location.href = 'login.html';
         return;
       }
 
@@ -142,22 +198,23 @@
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        if (res.status === 401) {
+          clearAuthAndRedirectToLogin();
+          return;
+        }
         setResult(data.message || data.error || 'Failed to add to cart', 'error');
         return;
       }
 
-      setResult(data.message || 'Added to cart', 'success');
-      // Optional: keep user on products page
+      setResult(data.message || 'Added item to cart successfully!', 'success');
     }
 
-function logout(e) {
+    function logout(e) {
       if (e) e.preventDefault();
       localStorage.removeItem('token');
       window.location.href = 'login.html';
     }
 
-
-    // If seller tries to open user products page, redirect to seller UI.
     (function redirectIfSeller() {
       const token = getToken();
       if (!token) return;
@@ -167,17 +224,12 @@ function logout(e) {
         if (role === 'seller') {
           window.location.href = 'seller_products.html';
         }
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     })();
 
     fetchProducts();
-
-    // expose for inline handlers
     window.addToCart = addToCart;
     window.logout = logout;
   </script>
 </body>
 </html>
-

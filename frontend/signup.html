@@ -3,40 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Signup</title>
+  <title>Create Your Account - ShopSphere</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="ambient-bg"></div>
   <div class="container">
-    <form class="card" onsubmit="event.preventDefault(); signup();">
-      <h2>Signup</h2>
+    <div class="card-wrapper">
+      <form class="card" onsubmit="event.preventDefault(); signup();">
+        <!-- Brand Header -->
+        <div class="brand-header">
+          <div class="brand-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+          </div>
+          <h2>Join ShopSphere</h2>
+          <p class="brand-subtitle">Discover curated collections tailored for you.</p>
+        </div>
 
-      <label for="name">Name</label>
-      <input type="text" id="name" placeholder="Enter your name" autocomplete="name" required />
+        <div class="input-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your name" autocomplete="name" required />
+        </div>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter email" autocomplete="email" required />
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="name@example.com" autocomplete="email" required />
+        </div>
 
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password" autocomplete="new-password" required />
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password" required />
+        </div>
 
-      <label for="role">Role</label>
-      <select id="role" required>
-        <option value="user" selected>User</option>
-        <option value="seller">Seller</option>
-      </select>
+        <div class="input-group">
+          <label for="role">Account Type</label>
+          <div class="select-wrapper">
+            <select id="role" required>
+              <option value="user" selected>Customer (Browse & Buy)</option>
+              <option value="seller">Seller (Manage Store)</option>
+            </select>
+          </div>
+        </div>
 
-      <button type="submit" id="submitBtn">Create account</button>
+        <button type="submit" id="submitBtn">
+          <span>Create account</span>
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+        </button>
 
-      <p id="result" class="result" aria-live="polite"></p>
+        <p id="result" class="result" aria-live="polite"></p>
 
-      <div class="links">
-        <a href="login.html">Already have an account? Login</a>
-      </div>
-    </form>
+        <div class="links">
+          <span>Already have an account?</span> <a href="login.html">Sign in</a>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="app.js"></script>
 </body>
 </html>
-

@@ -3,36 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>Sign In - ShopSphere</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="ambient-bg"></div>
   <div class="container">
-    <form class="card" onsubmit="event.preventDefault(); login();">
-      <h2>Login</h2>
+    <div class="card-wrapper">
+      <form class="card" onsubmit="event.preventDefault(); login();">
+        <!-- Brand Header -->
+        <div class="brand-header">
+          <div class="brand-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+            </svg>
+          </div>
+          <h2>Welcome Back</h2>
+          <p class="brand-subtitle">Sign in to manage your marketplace experience.</p>
+        </div>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter email" autocomplete="email" required />
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="name@example.com" autocomplete="email" required />
+        </div>
 
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" required />
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
+        </div>
 
-      <button type="submit" id="submitBtn">Login</button>
+        <button type="submit" id="submitBtn">
+          <span>Sign In</span>
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+        </button>
 
-      <p id="result" class="result" aria-live="polite"></p>
+        <p id="result" class="result" aria-live="polite"></p>
 
-      <div class="links" style="margin-top: 10px;">
-        <a href="products.html" id="postLoginLink" style="display:none;">Go to Products</a>
-      </div>
+        <!-- Dynamic Success Navigation Link -->
+        <div class="links dynamic-panel">
+          <a href="products.html" id="postLoginLink" style="display:none;" class="success-action-btn">Proceed to Products Dashboard →</a>
+        </div>
 
-
-      <div class="links">
-        <a href="signup.html">Create an account</a>
-      </div>
-    </form>
+        <div class="links">
+          <span>New to ShopSphere?</span> <a href="signup.html">Create an account</a>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="app.js"></script>
 </body>
 </html>
-

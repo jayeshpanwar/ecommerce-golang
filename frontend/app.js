@@ -1,5 +1,6 @@
 function setResult(message, type) {
   const el = document.getElementById('result');
+  if (!el) return;
   el.classList.remove('error', 'success');
   if (type) el.classList.add(type);
   el.innerText = message || '';
@@ -35,12 +36,31 @@ async function login() {
     localStorage.setItem('token', data.token);
     setResult(data.message || 'Login successful', 'success');
 
-    // Redirect to products page
-    const postLoginLink = document.getElementById('postLoginLink');
-    if (postLoginLink) {
-      postLoginLink.style.display = 'inline';
+    const token = data.token;
+
+    function parseRoleFromToken(t) {
+      if (!t) return 'customer';
+      try {
+        const parts = String(t).split('.');
+        if (parts.length < 2) return 'customer';
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(base64));
+
+        // Support possible claim key variations
+        return payload.role ?? payload.Role ?? payload.user_role ?? payload.userRole ?? 'customer';
+      } catch (_) {
+        return 'customer';
+      }
+    }
+
+    const userRole = parseRoleFromToken(token);
+
+    if (userRole === 'admin') {
+      window.location.href = 'admin_products.html';
+    } else if (userRole === 'seller') {
+      window.location.href = 'seller_products.html';
     } else {
-      // fallback navigation
       window.location.href = 'products.html';
     }
 
@@ -74,11 +94,17 @@ async function signup() {
       return;
     }
 
-    setResult(data.message || 'User created successfully', 'success');
+    // Success state: Update UI and redirect
+    setResult('Account created! Redirecting to login...', 'success');
+    
+    // Redirect to login page after a 1.5s delay
+    setTimeout(() => {
+      window.location.href = 'login.html';
+    }, 1000);
+
   } catch (err) {
     setResult('Network error. Is the backend running on http://localhost:8080?', 'error');
   } finally {
     setSubmitting(false);
   }
 }
-
