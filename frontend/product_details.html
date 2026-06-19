@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- E-commerce Detail Page Layout --- */
+    .product-detail-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @media (max-width: 850px) {
+      .product-detail-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+    }
+
+    /* --- Left Column: Visuals --- */
+    .product-gallery {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08));
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      position: relative;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .main-image {
+      max-width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .fallback-icon {
+      width: 120px;
+      height: 120px;
+      color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* --- Right Column: Details --- */
+    .product-info-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .brand-tag {
+      color: var(--primary, #6366f1);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .product-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+      margin: 0 0 16px 0;
+    }
+
+    .price-block {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .current-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .currency {
+      font-size: 1.5rem;
+      vertical-align: super;
+      color: var(--muted, #94a3b8);
+    }
+
+    .stock-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      width: max-content;
+    }
+
+    .status-in-stock {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-out-stock {
+      background: rgba(244, 63, 94, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .description-block {
+      color: var(--muted, #94a3b8);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    /* --- Action Buttons --- */
+    .action-group {
+      display: flex;
+      gap: 16px;
+    }
+
+    .add-cart-btn {
+      flex: 1;
+      padding: 18px 24px;
+      background: linear-gradient(90deg, var(--primary, #6366f1), #818cf8);
+      border: none;
+      border-radius: 14px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .add-cart-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.6);
+    }
+
+    .add-cart-btn:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.3);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* Skeleton Loading State */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere</span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">← Back to Catalog</button>
+        <button type="button" class="nav-btn primary-btn" onclick="window.location.href='cart.html'">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
+          Cart
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="product-detail-container" id="productContainer">
+    <div class="product-gallery skeleton" style="border: none;"></div>
+    <div class="product-info-panel">
+      <div class="skeleton" style="width: 100px; height: 20px; margin-bottom: 12px;"></div>
+      <div class="skeleton" style="width: 80%; height: 48px; margin-bottom: 16px;"></div>
+      <div class="skeleton" style="width: 150px; height: 40px; margin-bottom: 32px;"></div>
+      <div class="skeleton" style="width: 100%; height: 100px; margin-bottom: 40px;"></div>
+      <div class="skeleton" style="width: 100%; height: 60px;"></div>
+    </div>
+  </main>
+
+  <p id="result" class="result" aria-live="polite" style="max-width: 600px; margin: 20px auto;"></p>
+
+  <script>
+    const API_BASE = 'http://localhost:8080';
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() {
+      const token = getToken();
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      if (!el) return;
+
+      // Convert the inline <p> into an overlay toast so it won't force scrolling.
+      el.style.position = 'fixed';
+      el.style.left = '50%';
+      el.style.top = '16px';
+      el.style.transform = 'translateX(-50%)';
+      el.style.zIndex = '9999';
+      el.style.margin = '0';
+      el.style.padding = '12px 18px';
+      el.style.borderRadius = '14px';
+      el.style.maxWidth = '90vw';
+      el.style.width = 'fit-content';
+      el.style.boxShadow = '0 10px 25px rgba(0,0,0,0.35)';
+
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+
+      if (message) {
+        // Ensure it is always visible (in case something else is scrolling/animating).
+        window.scrollTo({ top: window.scrollY, behavior: 'instant' });
+        setTimeout(() => {
+          el.innerText = '';
+          el.className = 'result';
+          el.style.boxShadow = '';
+          el.style.padding = '';
+        }, 4000);
+      }
+    }
+
+
+    async function loadProductDetails() {
+      try {
+        // 1. Extract the 'id' parameter from the URL
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get('id');
+
+        if (!productId) {
+          document.getElementById('productContainer').innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
+              <h2>Product Not Found</h2>
+              <p class="muted">No product ID was provided in the URL.</p>
+              <button class="nav-btn primary-btn" style="margin-top:20px;" onclick="window.location.href='products.html'">Return to Catalog</button>
+            </div>
+          `;
+          return;
+        }
+
+        // 2. Fetch data (Robust approach: fetch all and filter if a specific /id route isn't available)
+        const res = await fetch(`${API_BASE}/products`, { method: 'GET', headers: authHeaders() });
+        if (!res.ok) throw new Error('Failed to fetch product data');
+        
+        const data = await res.json();
+        const products = data.data || data || [];
+        
+        // Find the specific product matching the URL ID
+        const product = products.find(p => String(p.id ?? p.ID) === String(productId));
+
+        if (!product) {
+          throw new Error('Product is no longer available in the catalog.');
+        }
+
+        // 3. Normalize Data
+        const pId = product.id ?? product.ID;
+        const name = product.name ?? product.Name;
+        const price = Number(product.price ?? product.Price).toFixed(2);
+        const stock = Number(product.stock ?? product.Stock);
+        const imageUrl = product.image_url ?? product.imageUrl ?? product.ImageURL ?? '';
+        const description = product.description ?? product.Description ?? "No detailed description available for this item. High-quality materials and premium finish standard on all our marketplace items.";
+        const isOutOfStock = stock <= 0;
+
+        // 4. Render Layout
+        const container = document.getElementById('productContainer');
+        container.innerHTML = `
+          <div class="product-gallery">
+            ${imageUrl 
+              ? `<img src="${imageUrl}" alt="${name}" class="main-image" onerror="this.outerHTML='<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke-width=\\'1\\' stroke=\\'currentColor\\' class=\\'fallback-icon\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9\\' /></svg>'">` 
+              : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="fallback-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9" /></svg>`
+            }
+          </div>
+
+          <div class="product-info-panel">
+            <div class="brand-tag">Verified Product</div>
+            <h1 class="product-title">${name}</h1>
+            
+            <div class="price-block">
+              <span class="currency">$</span>
+              <span class="current-price">${price}</span>
+            </div>
+
+            <div class="stock-status ${isOutOfStock ? 'status-out-stock' : 'status-in-stock'}">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:18px; height:18px;">
+                ${isOutOfStock 
+                  ? `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />` 
+                  : `<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />`
+                }
+              </svg>
+              ${isOutOfStock ? 'Currently Out of Stock' : `In Stock (${stock} available)`}
+            </div>
+
+            <div class="description-block">
+              ${description}
+            </div>
+
+            <div class="action-group">
+              <button class="add-cart-btn" onclick="addToCart(${pId})" ${isOutOfStock ? 'disabled' : ''}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:24px; height:24px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+                ${isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+              </button>
+            </div>
+          </div>
+        `;
+
+      } catch (error) {
+        document.getElementById('productContainer').innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: rgba(244, 63, 94, 0.1); border-radius: 16px; border: 1px solid rgba(244,63,94,0.3);">
+            <h2 style="color: #f43f5e;">Oops! Something went wrong.</h2>
+            <p style="color: #f1f5f9;">${error.message}</p>
+            <button class="nav-btn secondary-btn" style="margin-top:20px;" onclick="window.location.href='products.html'">Back to Catalog</button>
+          </div>
+        `;
+      }
+    }
+
+    async function addToCart(productId) {
+      const token = getToken();
+      if (!token) { 
+        setResult('Please login first to add items to your cart.', 'error'); 
+        setTimeout(() => window.location.href = 'login.html', 2000);
+        return; 
+      }
+
+      const btn = document.querySelector('.add-cart-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner" style="width:20px;height:20px;border-width:2px;"></span> Adding...`;
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/cart/add`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ product_id: Number(productId), quantity: 1 }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          if (res.status === 401) { 
+            localStorage.removeItem('token');
+            window.location.href = 'login.html'; 
+            return; 
+          }
+          throw new Error(data.message || data.error || 'Failed to add to cart');
+        }
+
+        setResult('Item successfully added to your cart!', 'success');
+        
+      } catch (e) {
+        setResult(e.message || 'Connection error while adding to cart.', 'error');
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // Initialize page
+    loadProductDetails();
+  </script>
+</body>
+</html>

@@ -266,7 +266,7 @@
           // Uses custom encapsulated class namespaces to completely prevent old layout rules leaking in
           return `
             <div class="custom-product-card">
-              <div class="custom-visual-pane">
+              <div class="custom-visual-pane" role="button" tabindex="0" onclick="openProductDetails(${id})" onkeydown="if(event.key==='Enter'){openProductDetails(${id})}">
                 ${p.imageUrl ? 
                   `<img class="custom-product-image" src="${p.imageUrl}" alt="${name ?? 'Product image'}" loading="lazy" onerror="this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke-width=\'1.2\' stroke=\'currentColor\' class=\'custom-fallback-box\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9\' /></svg>'" />` :
                   `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="custom-fallback-box">
@@ -277,13 +277,13 @@
                   ${isOutOfStock ? 'Sold Out' : `${stock} units left`}
                 </span>
               </div>
-              <div class="custom-details-pane">
+              <div class="custom-details-pane" role="button" tabindex="0" onclick="openProductDetails(${id})" onkeydown="if(event.key==='Enter'){openProductDetails(${id})}">
                 <h3 class="custom-product-title" title="${name}">${name ?? 'Premium Merchandise'}</h3>
                 <div class="custom-pricing-row">
                   <span class="custom-price-val">$${Number(price ?? 0).toFixed(2)}</span>
                 </div>
                 <div class="custom-actions-wrapper">
-                  <button type="button" class="custom-submit-btn" onclick="addToCart(${id})" ${isOutOfStock ? 'disabled' : ''}>
+                  <button type="button" class="custom-submit-btn" onclick="event.stopPropagation(); addToCart(${id})" ${isOutOfStock ? 'disabled' : ''}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     <span>${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
                   </button>
@@ -336,8 +336,15 @@
       } catch (e) {}
     })();
 
+    function openProductDetails(productId) {
+      const id = Number(productId);
+      if (!id) return;
+      window.open(`product_details.html?id=${encodeURIComponent(id)}`, '_blank');
+    }
+
     fetchProducts();
     window.addToCart = addToCart;
+    window.openProductDetails = openProductDetails;
     window.logout = logout;
   </script>
 </body>

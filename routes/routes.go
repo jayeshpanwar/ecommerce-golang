@@ -63,6 +63,7 @@ func SetupRoutes(router *gin.Engine) {
 		user.GET("/checkout/summary", controllers.Checkout)
 		user.POST("/orders", controllers.CreateOrder)
 		user.GET("/orders", controllers.ViewOrders)
+		//user.POST("/reviews", controllers.CreateReview)
 
 		//user.GET("/profile", controllers.Profile)
 	}

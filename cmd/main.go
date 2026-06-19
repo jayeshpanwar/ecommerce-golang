@@ -19,6 +19,8 @@ func main() {
 		&models.OrderItem{},
 		&models.Cart{},
 		&models.CartItem{},
+		&models.Review{},
+		&models.ReviewImage{},
 	)
 	if err != nil {
 		panic(err)

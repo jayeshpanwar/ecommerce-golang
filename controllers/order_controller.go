@@ -99,11 +99,17 @@ func CreateOrder(c *gin.Context) {
 		}
 
 		total := 0.0
+		// Build order total using only valid products.
+		// If a product was removed from DB (cart contains stale item), don't crash the checkout.
 		for _, item := range cartItems {
 			var product models.Product
 			if err := tx.First(&product, item.ProductID).Error; err != nil {
-				c.JSON(500, gin.H{"error": "Product not found"})
-				return err
+				// Client/state error: cart references a product that no longer exists.
+				c.JSON(400, gin.H{
+					"message":    "Product not found for cart item",
+					"product_id": item.ProductID,
+				})
+				return fmt.Errorf("product not found: %d", item.ProductID)
 			}
 			if item.Quantity > uint(product.Stock) {
 				c.JSON(400, gin.H{

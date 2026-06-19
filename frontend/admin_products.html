@@ -63,6 +63,94 @@
       gap: 8px;
     }
 
+    /* --- Admin product thumbnails + lightbox --- */
+    .admin-product-image-thumb {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      cursor: zoom-in;
+    }
+
+    .admin-product-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .image-lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 24px;
+    }
+
+    .image-lightbox-overlay.active {
+      display: flex;
+    }
+
+    .image-lightbox-card {
+      max-width: 980px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+    }
+
+    .image-lightbox-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .image-lightbox-title {
+      color: #e2e8f0;
+      font-weight: 700;
+      font-size: 0.92rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .image-lightbox-close {
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .image-lightbox-body {
+      background: rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .image-lightbox-image {
+      max-width: 100%;
+      max-height: 78vh;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255,255,255,0.02);
+    }
+
     .action-cell-group button {
       padding: 6px 12px;
       font-size: 0.82rem;
@@ -131,6 +219,20 @@
     </div>
   </nav>
 
+  <div id="imageLightboxOverlay" class="image-lightbox-overlay" onclick="window.closeImageModal && window.closeImageModal()">
+    <div class="image-lightbox-card" onclick="event.stopPropagation()">
+      <div class="image-lightbox-header">
+        <div id="imageLightboxTitle" class="image-lightbox-title">Product image</div>
+        <button type="button" class="image-lightbox-close" onclick="window.closeImageModal && window.closeImageModal()">
+          ✕
+        </button>
+      </div>
+      <div class="image-lightbox-body">
+        <img id="imageLightboxImage" class="image-lightbox-image" src="" alt="Product image" />
+      </div>
+    </div>
+  </div>
+
   <main class="storefront-container" style="max-width: 1100px;">
     <div class="storefront-header">
       <h2>Product Moderation Queue</h2>
@@ -184,9 +286,9 @@
     function escapeHtml(str) {
       return String(str ?? '')
         .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
+        .replaceAll('<', '<')
+        .replaceAll('>', '>')
+        .replaceAll('"', '"')
         .replaceAll("'", '&#039;');
     }
 
@@ -195,6 +297,35 @@
       localStorage.removeItem('token');
       window.location.href = 'login.html';
     }
+
+    function openImageModal(imageUrl, altText) {
+      const overlay = document.getElementById('imageLightboxOverlay');
+      const img = document.getElementById('imageLightboxImage');
+      const title = document.getElementById('imageLightboxTitle');
+
+      if (!overlay || !img) return;
+      img.src = imageUrl;
+      img.alt = altText || 'Product image';
+      if (title) title.innerText = altText || 'Product image';
+
+      overlay.classList.add('active');
+    }
+
+    function closeImageModal() {
+      const overlay = document.getElementById('imageLightboxOverlay');
+      const img = document.getElementById('imageLightboxImage');
+      if (overlay) overlay.classList.remove('active');
+      if (img) img.src = '';
+    }
+
+    (function setupImageLightboxHandlers() {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeImageModal();
+      });
+
+      window.openImageModal = openImageModal;
+      window.closeImageModal = closeImageModal;
+    })();
 
     async function fetchPending() {
       const token = getToken();
@@ -235,11 +366,19 @@
           const stock = Number(p.stock ?? p.Stock ?? 0);
           const status = p.status ?? p.Status ?? 'pending';
 
+          const imageUrl = p.image_url ?? p.imageUrl ?? p.ImageURL ?? '';
+          const hasImage = !!imageUrl;
+
           return `
             <tr>
               <td><span style="font-family: monospace; color: var(--muted);">#${id}</span></td>
               <td><span style="font-family: monospace;">USR-${sellerId}</span></td>
-              <td style="font-weight: 600; color: #fff;">${name}</td>
+              <td style="font-weight: 600; color: #fff;">
+                <div class="admin-product-name-cell">
+                  ${hasImage ? `<img src="${imageUrl}" alt="${name}" class="admin-product-image-thumb" loading="lazy" onerror="this.style.display='none'" onclick="openImageModal(${JSON.stringify(imageUrl)}, ${JSON.stringify(name)})" />` : ''}
+                  <span>${name}</span>
+                </div>
+              </td>
               <td class="desc-cell" title="${description}">${description}</td>
               <td style="font-weight: 700; color: #fff;">$${price}</td>
               <td>${stock} u</td>
@@ -283,13 +422,12 @@
       }
     }
 
-    // Security token validation routine
     (function redirectIfNotAdmin() {
       const token = getToken();
       if (!token) return;
       try {
         const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-        if (payload && payload.role !== 'admin') { window.location.href = 'products.html'; }
+        if (payload && payload.role !== 'admin') window.location.href = 'products.html';
       } catch (_) {}
     })();
 
@@ -302,3 +440,4 @@
   </script>
 </body>
 </html>
+
