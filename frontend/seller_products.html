@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Dashboard - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- Seller Page Table Stylings --- */
+    .table-responsive-wrapper {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .seller-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    .seller-table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 16px 20px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .seller-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .seller-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .seller-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Stock Status Identifiers */
+    .stock-tag {
+      font-weight: 600;
+    }
+    .stock-alert {
+      color: var(--danger);
+    }
+
+    /* Tab Filter Component Layout */
+    .tabs-container {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 20px;
+      border-radius: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      background: var(--primary, #6366f1);
+      border-color: var(--primary, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .tab-count {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+    
+    .status-pending { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .status-accepted { background: rgba(16, 185, 129, 0.12); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-rejected { background: rgba(244, 63, 94, 0.12); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); }
+    .status-default { background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid var(--card-border); }
+
+    .seller-product-image {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere <span style="font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 4px;">Seller</span></span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn primary-btn" onclick="window.location.href='seller_products_form.html'">
+          ➕ Manage Catalog
+        </button>
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='seller_orders.html'">
+          View Received Orders
+        </button>
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">
+          View Storefront
+        </button>
+        <button type="button" class="nav-btn secondary-btn" onclick="logout(event)" style="color: var(--danger) !important;">
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="storefront-container">
+    <div class="storefront-header">
+      <h2>Inventory Catalog</h2>
+    </div>
+
+    <p id="result" class="result" aria-live="polite"></p>
+
+    <div class="tabs-container">
+      <button class="tab-btn active" onclick="switchTab('pending')">
+        <span>Pending</span> <span id="count-pending" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('accepted')">
+        <span>Accepted</span> <span id="count-accepted" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('rejected')">
+        <span>Rejected</span> <span id="count-rejected" class="tab-count">0</span>
+      </button>
+    </div>
+
+    <div class="table-responsive-wrapper">
+      <div style="overflow-x: auto;">
+        <table class="seller-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Product Name</th>
+              <th>Unit Price</th>
+              <th>Stock Status</th>
+              <th>Listing Status</th>
+            </tr>
+          </thead>
+          <tbody id="productsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+    let allProducts = []; // Cached array memory store to allow instant local filtering
+    let currentTab = 'pending';
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() {
+      const token = getToken();
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      if (!el) return;
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('productsTbody').innerHTML = `
+        <tr><td colspan="5" class="muted" style="text-align:center; padding: 40px; font-style: italic;">${msg}</td></tr>
+      `;
+    }
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function getStatusClass(status) {
+      const s = String(status || '').toLowerCase();
+      if (s.includes('pending') || s.includes('draft') || s.includes('process')) return 'status-pending';
+      if (s.includes('accepted') || s.includes('active') || s.includes('complete')) return 'status-accepted';
+      if (s.includes('rejected') || s.includes('cancel') || s.includes('fail')) return 'status-rejected';
+      return 'status-default';
+    }
+
+    // Handles view switches dynamically on UI thread without spamming additional API fetch queries
+    function switchTab(tabName) {
+      currentTab = tabName;
+      
+      // Update Tab CSS UI Active State Classes
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(`'${tabName}'`)) {
+          btn.classList.add('active');
+        }
+      });
+
+      renderCategorizedTable();
+    }
+
+    function updateBadgeCounters() {
+      const counts = { pending: 0, accepted: 0, rejected: 0 };
+      
+      allProducts.forEach(p => {
+        const rawStatus = String(p.status ?? p.Status ?? 'pending').toLowerCase();
+
+        // Backend uses:
+        // - pending
+        // - approved
+        // - rejected
+        // UI tabs expect:
+        // - Pending
+        // - Accepted (including approved)
+        // - Rejected
+        if (
+          rawStatus.includes('accepted') ||
+          rawStatus.includes('active') ||
+          rawStatus.includes('approved')
+        ) {
+          counts.accepted++;
+        } else if (rawStatus.includes('rejected') || rawStatus.includes('cancel')) {
+          counts.rejected++;
+        } else {
+          counts.pending++; // Defaults any implicit types, processing hooks, or missing attributes to pending
+        }
+      });
+
+
+      document.getElementById('count-pending').innerText = counts.pending;
+      document.getElementById('count-accepted').innerText = counts.accepted;
+      document.getElementById('count-rejected').innerText = counts.rejected;
+    }
+
+    function renderCategorizedTable() {
+      // Filter list data array based on state criteria values mapping
+      const filtered = allProducts.filter(p => {
+        const rawStatus = String(p.status ?? p.Status ?? 'pending').toLowerCase();
+        if (currentTab === 'accepted') {
+          return rawStatus.includes('accepted') || rawStatus.includes('active') || rawStatus.includes('approved');
+        }
+        if (currentTab === 'rejected') return rawStatus.includes('rejected') || rawStatus.includes('cancel');
+        return !rawStatus.includes('accepted') && !rawStatus.includes('active') && !rawStatus.includes('approved') && !rawStatus.includes('rejected') && !rawStatus.includes('cancel');
+
+      });
+
+      if (filtered.length === 0) {
+        renderEmpty(`No items match the "${currentTab}" category threshold.`);
+        return;
+      }
+
+      const rows = filtered.map(p => {
+        const id = p.id ?? p.ID ?? '';
+        const name = p.name ?? p.Name ?? 'Unnamed Product';
+        const price = Number(p.price ?? p.Price ?? 0).toFixed(2);
+        const stock = Number(p.stock ?? p.Stock ?? 0);
+        const rawStatus = p.status ?? p.Status ?? 'Pending';
+        const imageUrl = p.image_url ?? p.imageUrl ?? p.ImageURL ?? '';
+        const hasImage = !!imageUrl;
+
+        const stockClass = stock === 0 ? 'stock-tag stock-alert' : 'stock-tag';
+        const stockLabel = stock === 0 ? 'Out of Stock' : `${stock} units`;
+
+        return `
+          <tr>
+            <td><span style="font-family: monospace; color: var(--muted);">#${id}</span></td>
+            <td style="font-weight: 600; color: #fff;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                ${hasImage ? `<img src="${imageUrl}" alt="${name}" class="seller-product-image" loading="lazy" onerror="this.style.display='none'" />` : ''}
+                <span>${name}</span>
+              </div>
+            </td>
+            <td style="font-weight: 700;">$${price}</td>
+            <td><span class="${stockClass}">${stockLabel}</span></td>
+            <td><span class="status-badge ${getStatusClass(rawStatus)}">${rawStatus}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('productsTbody').innerHTML = rows;
+    }
+
+    async function fetchSellerProducts() {
+      const token = getToken();
+      if (!token) {
+        setResult('Please login first.', 'error');
+        renderEmpty('Login required.');
+        return;
+      }
+
+      try {
+        setResult('', null);
+        document.getElementById('productsTbody').innerHTML = `
+          <tr><td colspan="5" class="muted" style="text-align:center; padding: 40px;"><div class="spinner" style="margin: 0 auto 10px;"></div>Updating records...</td></tr>
+        `;
+
+        const res = await fetch(`${API_BASE}/seller/products`, { method: 'GET', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to fetch inventory', 'error');
+          renderEmpty('Could not load catalog.');
+          return;
+        }
+
+        allProducts = data.data || data || [];
+        if (!Array.isArray(allProducts) || allProducts.length === 0) {
+          renderEmpty('Your catalog is empty. Click "Manage Catalog" to add your first product.');
+          return;
+        }
+
+        updateBadgeCounters();
+        renderCategorizedTable();
+      } catch (e) {
+        console.error(e);
+        setResult('Network error while connecting to catalog service.', 'error');
+        renderEmpty('Network error.');
+      }
+    }
+
+    // Role-enforcement guard routing
+    (function redirectIfNotSeller() {
+      const token = getToken();
+      if (!token) return;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (payload && payload.role !== 'seller') { window.location.href = 'products.html'; }
+      } catch (e) {}
+    })();
+
+    fetchSellerProducts();
+    window.switchTab = switchTab;
+    window.logout = logout;
+  </script>
+</body>
+</html>

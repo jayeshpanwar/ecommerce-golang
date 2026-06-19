@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- Smooth View Transition States --- */
+    .checkout-summary {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .summary-card {
+      flex: 1;
+      min-width: 160px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .summary-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* Fixed Actions Layout Bar */
+    .cart-actions-bar {
+      margin-top: 24px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .cart-actions-bar button {
+      width: max-content !important;
+      padding: 12px 32px;
+    }
+
+    /* Checkout Items Preview Minimalist List */
+    .checkout-preview-list {
+      margin: 20px 0;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 12px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    
+    .checkout-preview-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .checkout-preview-item:last-child {
+      border-bottom: none;
+    }
+
+    /* --- ✨ NEW: Dustbin Animation Effect ✨ --- */
+    .removing-dustbin {
+      /* Binds the toss and shrink animation */
+      animation: dustbinFall 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+      pointer-events: none; /* Prevents double-clicking during animation */
+      overflow: hidden;
+    }
+
+    @keyframes dustbinFall {
+      0% { 
+        transform: scale(1) rotate(0); 
+        opacity: 1; 
+        max-height: 120px; 
+        margin-bottom: 14px;
+      }
+      30% { 
+        /* Slight pop up before falling */
+        transform: scale(1.02) translateY(-5px) rotate(-1deg); 
+        opacity: 0.9; 
+        max-height: 120px;
+        margin-bottom: 14px;
+      }
+      100% { 
+        /* Tumble down, shrink, fade out, and collapse layout space */
+        transform: scale(0.3) translateY(80px) rotate(15deg); 
+        opacity: 0; 
+        max-height: 0px; 
+        margin-bottom: 0px; 
+        padding-top: 0; 
+        padding-bottom: 0; 
+        border-width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere</span>
+      </div>
+      <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">← Back to Store</button>
+    </div>
+  </nav>
+
+  <main class="storefront-container" style="max-width: 850px;">
+    <div class="storefront-header">
+      <h2 id="cartTitle">Your Shopping Bag</h2>
+    </div>
+
+    <p id="result" class="result" aria-live="polite"></p>
+
+    <div id="cartListSection">
+      <div id="cartItems" class="list marketplace-list"></div>
+      
+      <div class="cart-actions-bar" id="checkoutBtnWrapper">
+        <button type="button" class="nav-btn primary-btn" id="checkoutBtn" onclick="onCheckoutClick()" disabled>
+          Proceed to Checkout →
+        </button>
+      </div>
+    </div>
+
+    <div class="checkout-summary" id="checkoutSection" style="display: none;">
+      <div class="section-title" style="font-size: 1.3rem; margin-bottom: 4px; font-weight: 700;">Secure Checkout</div>
+      <p class="muted" style="font-size: 0.85rem; margin-bottom: 16px;">Please review the items in your order below.</p>
+      
+      <div id="checkoutItemsPreview" class="checkout-preview-list"></div>
+      
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div class="summary-card">
+          <div class="summary-label">Total Items</div>
+          <div id="totalItems" class="summary-value">0</div>
+        </div>
+        <div class="summary-card" style="border-left: 2px solid var(--primary);">
+          <div class="summary-label">Total Order Price</div>
+          <div id="totalPrice" class="summary-value" style="color: var(--success);">$0.00</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid var(--card-border); padding-top: 20px;">
+        <button type="button" class="nav-btn secondary-btn" id="modifyItemsBtn" onclick="closeCheckout()" style="width: auto !important; padding: 10px 20px;">
+          ← Modify Items
+        </button>
+        
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span id="summaryHint" class="muted" style="font-size: 0.88rem;">Review totals then submit.</span>
+          <button type="button" class="nav-btn primary-btn" id="confirmOrderBtn" onclick="placeOrder()" style="width: auto !important; padding: 12px 36px;" disabled>
+            ⚡ Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+    let globalCartItems = []; // Local mirror to safely keep product track
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() { const token = getToken(); return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }; }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+    }
+
+    function clearAuthAndRedirectToLogin() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function fetchCart() {
+      try {
+        const token = getToken();
+        if (!token) { setResult('Login required.', 'error'); window.location.href = 'login.html'; return; }
+        
+        const res = await fetch(`${API_BASE}/cart`, { method: 'GET', headers: authHeaders() });
+        
+        // If order was just placed, backend safely drops 200 empty status or 404 block
+        if (res.status === 401) {
+          clearAuthAndRedirectToLogin();
+          return;
+        }
+
+        if (res.status === 404 || !res.ok) {
+          globalCartItems = [];
+          renderEmptyCart();
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        globalCartItems = data.items || [];
+        
+        if (globalCartItems.length === 0) {
+          renderEmptyCart();
+          return;
+        }
+
+        document.getElementById('checkoutBtn').disabled = false;
+
+        const html = globalCartItems.map(it => `
+          <div class="cart-row" id="cart-row-${it.cart_item_id ?? it.id}">
+            <div class="item-info">
+              <h3 class="item-name">${it.product_name ?? it.ProductName ?? 'Item'}</h3>
+              <p class="meta">Unit Price: <span style="color:var(--primary); font-weight:700;">$${Number(it.price ?? it.Price).toFixed(2)}</span></p>
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="decreaseQty(${it.cart_item_id ?? it.id})" ${it.quantity <= 1 ? 'disabled' : ''}>-</button>
+              <span class="qty">${it.quantity}</span>
+              <button class="qty-btn" onclick="increaseQty(${it.product_id ?? it.ProductID})">+</button>
+              
+              <button class="qty-btn delete-btn" onclick="deleteCartItem(${it.cart_item_id ?? it.id})">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px; margin-right: 4px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>
+                Remove
+              </button>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('cartItems').innerHTML = html;
+      } catch (e) { 
+        setResult('Connection error fetching cart.', 'error'); 
+      }
+    }
+
+    function renderEmptyCart() {
+      document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.style.display = 'inline-flex';
+      }
+    }
+
+    window.increaseQty = async (pid) => {
+      try {
+        const res = await fetch(`${API_BASE}/cart/add`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ product_id: pid, quantity: 1 }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
+          setResult(data.message || data.error || 'Failed to update cart', 'error');
+          return;
+        }
+      } catch (e) {
+        setResult('Connection error updating cart.', 'error'); return;
+      }
+      await fetchCart();
+    };
+    
+    window.decreaseQty = async (cid) => { 
+      const token = getToken();
+      if (!token) { clearAuthAndRedirectToLogin(); return; }
+
+      const res = await fetch(`${API_BASE}/cart/items/${cid}/decrease`, { method: 'PUT', headers: authHeaders() }); 
+      if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
+      await fetchCart();
+    };
+    
+    window.deleteCartItem = async (cid) => { 
+      const token = getToken();
+      if (!token) { clearAuthAndRedirectToLogin(); return; }
+
+      // 1. Locate the specific cart row
+      const rowElement = document.getElementById(`cart-row-${cid}`);
+      
+      // 2. Trigger the CSS animation if the element exists
+      if (rowElement) {
+        rowElement.classList.add('removing-dustbin');
+        // Wait exactly 450ms for the "toss away" animation to finish
+        await new Promise(resolve => setTimeout(resolve, 450));
+      }
+
+      // 3. Make the API Call to strictly delete the item from the DB backend
+      try {
+        const res = await fetch(`${API_BASE}/cart/items/${cid}`, { method: 'DELETE', headers: authHeaders() }); 
+        if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
+      } catch (e) {
+        console.error('Delete request failed:', e);
+      }
+      
+      // 4. Refetch the updated data logic 
+      await fetchCart();
+    };
+
+    function setSummary(totItems, totPrice) {
+      document.getElementById('totalItems').innerText = String(totItems ?? 0);
+      document.getElementById('totalPrice').innerText = `$${Number(totPrice ?? 0).toFixed(2)}`;
+
+      const confirmBtn = document.getElementById('confirmOrderBtn');
+      const hint = document.getElementById('summaryHint');
+      const hasItems = (totItems ?? 0) > 0;
+      
+      if (confirmBtn) confirmBtn.disabled = !hasItems;
+      if (hint) hint.innerHTML = hasItems ? 'Ready to submit order.' : 'Bag is empty.';
+    }
+
+    window.loadCheckoutSummary = async () => {
+      try {
+        const token = getToken();
+        if (!token) { setResult('Login required.', 'error'); return { ok: false }; }
+
+        const res = await fetch(`${API_BASE}/checkout/summary`, { method: 'GET', headers: authHeaders() });
+        if (res.status === 401) {
+          clearAuthAndRedirectToLogin();
+          return { ok: false };
+        }
+        if (!res.ok) {
+          setSummary(0, 0);
+          return { ok: false };
+        }
+        
+        const data = await res.json().catch(() => ({}));
+        const items = Array.isArray(data.items) ? data.items : globalCartItems;
+        const totalItems = items.reduce((sum, it) => sum + (Number(it.quantity ?? it.Quantity ?? 0) || 0), 0);
+        const totalAmount = data.total_amount ?? data.totalAmount ?? 0;
+        
+        setSummary(totalItems, totalAmount);
+        return { ok: true, totalItems, totalAmount };
+      } catch (e) {
+        setSummary(0, 0);
+        return { ok: false };
+      }
+    };
+
+    window.onCheckoutClick = async () => {
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (checkoutBtn) checkoutBtn.disabled = true;
+      setResult('', null);
+
+      // Refresh data array explicitly
+      await fetchCart();
+
+      if (globalCartItems.length === 0) {
+        setResult('Your bag is empty.', 'error');
+        if (checkoutBtn) checkoutBtn.disabled = false;
+        return;
+      }
+
+      const res = await loadCheckoutSummary();
+      if (!res || !res.ok) {
+        // Fallback manually calculating totals if specific endpoint drops out
+        const totalItems = globalCartItems.reduce((sum, it) => sum + it.quantity, 0);
+        const totalAmount = globalCartItems.reduce((sum, it) => sum + (it.quantity * (it.price ?? it.Price ?? 0)), 0);
+        setSummary(totalItems, totalAmount);
+      }
+
+      // Render out detailed item rows into Checkout View Panel
+      const previewHtml = globalCartItems.map(it => `
+        <div class="checkout-preview-item">
+          <div>
+            <span style="font-weight: 600; color: #fff;">${it.product_name ?? it.ProductName ?? 'Item'}</span>
+            <span class="muted" style="font-size: 0.85rem; margin-left: 8px;">(x${it.quantity})</span>
+          </div>
+          <div style="font-weight: 700; color: #e2e8f0;">
+            $${(Number(it.price ?? it.Price ?? 0) * it.quantity).toFixed(2)}
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('checkoutItemsPreview').innerHTML = previewHtml;
+
+      // Swap Workspace View state elements
+      document.getElementById('cartListSection').style.display = 'none';
+      document.getElementById('checkoutSection').style.display = 'block';
+      document.getElementById('cartTitle').innerText = 'Order Checkout';
+    };
+
+    window.closeCheckout = () => {
+      document.getElementById('checkoutSection').style.display = 'none';
+      document.getElementById('cartListSection').style.display = 'block';
+      document.getElementById('cartTitle').innerText = 'Your Shopping Bag';
+      
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (checkoutBtn) checkoutBtn.disabled = globalCartItems.length === 0;
+    };
+
+    window.placeOrder = async () => {
+      try {
+        const token = getToken();
+        if (!token) { setResult('Login required.', 'error'); return; }
+
+        const confirmBtn = document.getElementById('confirmOrderBtn');
+        if (confirmBtn) confirmBtn.disabled = true;
+
+        const res = await fetch(`${API_BASE}/orders`, { method: 'POST', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 401) {
+          clearAuthAndRedirectToLogin();
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        if (!res.ok) {
+          // Backend returns 400 with an "error" field (e.g. insufficient stock) or "message".
+          setResult(data.error || data.message || 'Failed to place order', 'error');
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        // 1. Alert Success
+        setResult(data.message || 'Order successfully processed!', 'success');
+        
+        // 2. Clear out local storage matrices completely
+        globalCartItems = [];
+        setSummary(0, 0);
+        document.getElementById('checkoutItemsPreview').innerHTML = '';
+        document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
+        
+        // 3. Remove "Modify Items" navigation option after check out completion
+        document.getElementById('modifyItemsBtn').style.display = 'none';
+        document.getElementById('summaryHint').innerText = 'Transaction completed.';
+      } catch (e) {
+        setResult('Connection error processing transaction.', 'error');
+      }
+    };
+
+    // Initialize View
+    fetchCart();
+  </script>
+</body>
+</html>

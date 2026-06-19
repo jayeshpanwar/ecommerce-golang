@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Orders - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* --- Modern Glassmorphic Table Layout --- */
+    .table-responsive-wrapper {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08));
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    .orders-table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 16px 20px;
+      color: var(--muted, #94a3b8);
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.08));
+    }
+
+    .orders-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .orders-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .orders-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* --- Category Tabs Components --- */
+    .tabs-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 18px;
+      border-radius: 10px;
+      color: var(--muted, #94a3b8);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      background: var(--primary, #6366f1);
+      border-color: var(--primary, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .tab-count {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    /* --- Status Badges --- */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .status-pending { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .status-accepted { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.22); }
+    .status-shipped { background: rgba(168, 85, 247, 0.12); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.22); }
+    .status-delivered { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-rejected { background: rgba(244, 63, 94, 0.12); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); }
+    .status-default { background: rgba(255, 255, 255, 0.06); color: var(--muted, #94a3b8); border: 1px solid var(--card-border, rgba(255, 255, 255, 0.08)); }
+
+    .order-id-txt {
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--primary, #a78bfa);
+    }
+
+    /* --- Contextual Adaptive Actions Buttons --- */
+    .action-cell-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-accept-ctrl { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #34d399; }
+    .btn-accept-ctrl:hover { background: rgba(16, 185, 129, 0.2); }
+
+    .btn-reject-ctrl { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.3); color: #f43f5e; }
+    .btn-reject-ctrl:hover { background: rgba(244, 63, 94, 0.2); }
+
+    .btn-ship-ctrl { background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3); color: #d8b4fe; }
+    .btn-ship-ctrl:hover { background: rgba(168, 85, 247, 0.2); }
+
+    .btn-deliver-ctrl { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+    .btn-deliver-ctrl:hover { background: rgba(59, 130, 246, 0.2); }
+
+    .no-actions-msg {
+      font-size: 0.8rem;
+      color: var(--muted, #94a3b8);
+      font-style: italic;
+    }
+
+    .muted {
+      color: var(--muted, #94a3b8) !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere <span style="font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 4px;">Seller</span></span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='seller_products.html'">← Back</button>
+        <button type="button" class="nav-btn secondary-btn" onclick="logout(event)" style="color: var(--danger) !important;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="storefront-container">
+    <div class="storefront-header">
+      <h2>Orders You Received</h2>
+      <p class="muted" style="margin-top: 6px;">Manage execution lifecycles and pipeline statuses here.</p>
+    </div>
+
+    <p id="result" class="result" aria-live="polite"></p>
+
+    <div class="tabs-container">
+      <button class="tab-btn active" onclick="switchFilterTab('all')">
+        <span>All Orders</span> <span id="count-all" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchFilterTab('pending')">
+        <span>Pending</span> <span id="count-pending" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchFilterTab('accepted')">
+        <span>Accepted</span> <span id="count-accepted" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchFilterTab('shipped')">
+        <span>Shipped</span> <span id="count-shipped" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchFilterTab('delivered')">
+        <span>Delivered</span> <span id="count-delivered" class="tab-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchFilterTab('rejected')">
+        <span>Rejected</span> <span id="count-rejected" class="tab-count">0</span>
+      </button>
+    </div>
+
+    <div class="table-responsive-wrapper">
+      <div style="overflow-x: auto;">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Ordered At</th>
+              <th>Status</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+    let cachedOrders = [];
+    let activeFilterTab = 'all';
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() {
+      const token = getToken();
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('ordersTbody').innerHTML = `
+        <tr><td colspan="8" class="muted" style="text-align:center; padding: 40px; font-style: italic;">${msg}</td></tr>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function formatDate(dt) {
+      try {
+        const d = new Date(dt);
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'});
+      } catch (_) {
+        return String(dt ?? '');
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      const s = String(status ?? '').toLowerCase();
+      if (s.includes('pending')) return 'status-pending';
+      if (s.includes('accept') || s.includes('approved')) return 'status-accepted';
+      if (s.includes('ship')) return 'status-shipped';
+      if (s.includes('deliver')) return 'status-delivered';
+      if (s.includes('reject')) return 'status-rejected';
+      return 'status-default';
+    }
+
+    function switchFilterTab(tabName) {
+      activeFilterTab = tabName;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('onclick').includes(`'${tabName}'`)) {
+          btn.classList.add('active');
+        }
+      });
+      renderFilteredTable();
+    }
+
+    function updateBadgeCounters() {
+      const metrics = { all: cachedOrders.length, pending: 0, accepted: 0, shipped: 0, delivered: 0, rejected: 0 };
+      
+      cachedOrders.forEach(o => {
+        const s = String(o.order_status ?? o.OrderStatus ?? 'pending').toLowerCase();
+        if (s.includes('pending')) metrics.pending++;
+        else if (s.includes('accept') || s.includes('approved')) metrics.accepted++;
+        else if (s.includes('ship')) metrics.shipped++;
+        else if (s.includes('deliver')) metrics.delivered++;
+        else if (s.includes('reject')) metrics.rejected++;
+      });
+
+      Object.keys(metrics).forEach(key => {
+        const el = document.getElementById(`count-${key}`);
+        if (el) el.innerText = metrics[key];
+      });
+    }
+
+    function renderFilteredTable() {
+      const filtered = cachedOrders.filter(o => {
+        if (activeFilterTab === 'all') return true;
+        const s = String(o.order_status ?? o.OrderStatus ?? 'pending').toLowerCase();
+        if (activeFilterTab === 'accepted') return s.includes('accept') || s.includes('approved');
+        return s.includes(activeFilterTab);
+      });
+
+      if (filtered.length === 0) {
+        renderEmpty(`No orders currently marked as "${activeFilterTab}".`);
+        return;
+      }
+
+      const rows = filtered.map(o => {
+        const orderId = o.order_id ?? o.OrderID ?? '';
+        const productName = o.product_name ?? o.ProductName ?? 'Product';
+        const customerName = o.customer_name ?? o.CustomerName ?? 'Customer';
+        const customerEmail = o.customer_email ?? o.CustomerEmail ?? '';
+        const qty = Number(o.quantity ?? o.Quantity ?? 0);
+        const price = Number(o.price ?? o.Price ?? 0).toFixed(2);
+        const orderedAt = o.ordered_at ?? o.OrderedAt ?? '';
+        const status = o.order_status ?? o.OrderStatus ?? 'pending';
+
+        const sLower = String(status).toLowerCase();
+        const orderItemId = o.id ?? o.order_item_id ?? o.OrderItemID ?? '';
+
+        // Generate Clean Context-Driven Active Controls Layout Elements 
+        let actionControlsHtml = '';
+        if (sLower.includes('pending')) {
+          actionControlsHtml = `
+            <button type="button" class="btn-action btn-accept-ctrl" onclick="acceptOrder('${escapeHtml(orderItemId)}')">✓ Accept</button>
+            <button type="button" class="btn-action btn-reject-ctrl" onclick="rejectOrder('${escapeHtml(orderItemId)}')">✕ Reject</button>
+          `;
+        } else if (sLower.includes('accept') || sLower.includes('approved')) {
+          actionControlsHtml = `
+            <button type="button" class="btn-action btn-ship-ctrl" onclick="shipOrder('${escapeHtml(orderItemId)}')">➔ Ship Item</button>
+          `;
+        } else if (sLower.includes('ship')) {
+          actionControlsHtml = `
+            <button type="button" class="btn-action btn-deliver-ctrl" onclick="deliverOrder('${escapeHtml(orderItemId)}')">✓ Deliver</button>
+          `;
+        } else {
+          actionControlsHtml = `<span class="no-actions-msg">No Actions Remaining</span>`;
+        }
+
+        return `
+          <tr>
+            <td><span class="order-id-txt">#${escapeHtml(orderId)}</span></td>
+            <td>
+              <div style="font-weight: 600; color: #fff;">${escapeHtml(customerName)}</div>
+              <div class="muted" style="font-size: 0.82rem; margin-top: 2px;">${escapeHtml(customerEmail)}</div>
+            </td>
+            <td><div style="font-weight: 600; color: #fff;">${escapeHtml(productName)}</div></td>
+            <td style="font-weight: 600;">${qty}</td>
+            <td style="font-weight: 700; color: var(--primary, #a78bfa);">$${price}</td>
+            <td style="font-size: 0.85rem; color: #cbd5e1;">${escapeHtml(formatDate(orderedAt))}</td>
+            <td><span class="status-badge ${getStatusBadgeClass(status)}">${escapeHtml(status)}</span></td>
+            <td style="text-align: right;"><div class="action-cell-group" style="justify-content: flex-end;">${actionControlsHtml}</div></td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('ordersTbody').innerHTML = rows;
+    }
+
+    async function fetchSellerOrders(isQuietRefresh = false) {
+      const token = getToken();
+      if (!token) {
+        setResult('Please login first.', 'error');
+        renderEmpty('Login required.');
+        return;
+      }
+
+      try {
+        if (!isQuietRefresh) {
+          setResult('', null);
+          document.getElementById('ordersTbody').innerHTML = `
+            <tr><td colspan="8" class="muted" style="text-align:center; padding: 40px;">
+              <div class="spinner" style="margin: 0 auto 10px;"></div>
+              Loading orders pipeline...
+            </td></tr>
+          `;
+        }
+
+        const res = await fetch(`${API_BASE}/seller/orders`, { method: 'GET', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to fetch seller orders', 'error');
+          renderEmpty('Could not load orders pipeline.');
+          return;
+        }
+
+        cachedOrders = data.data || data || [];
+        updateBadgeCounters();
+        renderFilteredTable();
+      } catch (e) {
+        console.error(e);
+        setResult('Network error while loading seller orders.', 'error');
+        renderEmpty('Network error.');
+      }
+    }
+
+    async function acceptOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/accept`, { method: 'PUT', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to accept order', 'error'); return; }
+        setResult(data.message || 'Order accepted', 'success');
+        await fetchSellerOrders(true);
+      } catch (e) { setResult('Network error while accepting order.', 'error'); }
+    }
+
+    async function rejectOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/reject`, { method: 'PUT', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to reject order', 'error'); return; }
+        setResult(data.message || 'Order rejected', 'success');
+        await fetchSellerOrders(true);
+      } catch (e) { setResult('Network error while rejecting order.', 'error'); }
+    }
+
+    async function shipOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/ship`, { method: 'PUT', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to mark shipped', 'error'); return; }
+        setResult(data.message || 'Order marked as shipped', 'success');
+        await fetchSellerOrders(true);
+      } catch (e) { setResult('Network error while marking shipped.', 'error'); }
+    }
+
+    async function deliverOrder(orderItemId) {
+      try {
+        const res = await fetch(`${API_BASE}/seller/orders/${encodeURIComponent(orderItemId)}/deliver`, { method: 'PUT', headers: authHeaders() });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to mark delivered', 'error'); return; }
+        setResult(data.message || 'Order marked as delivered', 'success');
+        await fetchSellerOrders(true);
+      } catch (e) { setResult('Network error while marking delivered.', 'error'); }
+    }
+
+    fetchSellerOrders();
+    window.switchFilterTab = switchFilterTab;
+    window.acceptOrder = acceptOrder;
+    window.rejectOrder = rejectOrder;
+    window.shipOrder = shipOrder;
+    window.deliverOrder = deliverOrder;
+    window.logout = logout;
+  </script>
+</body>
+</html>

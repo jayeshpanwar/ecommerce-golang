@@ -5,6 +5,7 @@ import (
 	"ecommerce/models"
 	"ecommerce/routes"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,12 +19,22 @@ func main() {
 		&models.OrderItem{},
 		&models.Cart{},
 		&models.CartItem{},
+		&models.Review{},
+		&models.ReviewImage{},
 	)
 	if err != nil {
 		panic(err)
 	}
 
 	r := gin.Default()
+	r.Static("/uploads", "./uploads")
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 	routes.SetupRoutes(r)
 
 	r.Run(":8080")

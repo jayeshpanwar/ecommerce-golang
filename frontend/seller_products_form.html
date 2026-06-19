@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Catalog - ShopSphere</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .form-box {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* --- Interactive Tab Switcher Styling --- */
+    .tab-container {
+      display: flex;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 6px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent !important;
+      border: 0;
+      padding: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: none !important;
+      height: auto;
+      width: auto !important;
+    }
+    .tab-btn:hover {
+      color: #fff;
+      transform: none !important;
+      background: rgba(255, 255, 255, 0.03) !important;
+    }
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Form Panels Configuration visibility control */
+    .form-panel {
+      display: none;
+      animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .form-panel.active {
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      resize: vertical;
+    }
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--input-focus);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 20px 0;
+    }
+
+    .btn-danger-action {
+      background: linear-gradient(90deg, var(--danger), #e11d48) !important;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3) !important;
+    }
+    .btn-danger-action:hover {
+      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.5) !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <div class="brand-logo small-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+          </svg>
+        </div>
+        <span class="nav-brand-name">ShopSphere <span style="font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 4px;">Console</span></span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='seller_products.html'">
+          ← Back to Catalog
+        </button>
+        <button type="button" class="nav-btn secondary-btn" onclick="logout(event)" style="color: var(--danger) !important;">
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="storefront-container">
+    <div class="form-box card">
+      
+      <div class="storefront-header" style="margin-bottom: 20px;">
+        <h2>Catalog Operations</h2>
+      </div>
+
+      <div class="tab-container">
+        <button type="button" class="tab-btn active" onclick="switchTab('addPanel', this)">✨ Add Product</button>
+        <button type="button" class="tab-btn" onclick="switchTab('editPanel', this)">📝 Edit Info</button>
+        <button type="button" class="tab-btn" onclick="switchTab('deletePanel', this)">🗑️ Delete</button>
+      </div>
+
+      <p id="result" class="result" aria-live="polite"></p>
+
+      <div id="addPanel" class="form-panel active">
+        <form onsubmit="event.preventDefault(); createProduct();">
+          <div class="section-title" style="color: var(--success);">Create New Listing</div>
+          <div class="input-group">
+            <label for="name">Product Name</label>
+            <input type="text" id="name" placeholder="e.g. Mechanical Wireless Keyboard" required />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="input-group">
+              <label for="price">Price ($)</label>
+              <input type="number" id="price" min="0" step="0.01" placeholder="0.00" required />
+            </div>
+            <div class="input-group">
+              <label for="stock">Available Stock</label>
+              <input type="number" id="stock" min="0" step="1" placeholder="0" required />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="description">Product Description</label>
+            <textarea id="description" rows="3" placeholder="Provide features, specifications, and details..."></textarea>
+          </div>
+
+          <div class="input-group">
+            <label for="image">Product Image</label>
+            <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg" required />
+          </div>
+
+          <button type="submit" id="submitBtn">Publish Product</button>
+
+        </form>
+      </div>
+
+      <div id="editPanel" class="form-panel">
+        <form onsubmit="event.preventDefault(); updateProduct();">
+          <div class="section-title" style="color: var(--primary);">Modify Product Data</div>
+          <div class="input-group">
+            <label for="editId">Target Product ID</label>
+            <input type="number" id="editId" min="1" placeholder="Enter product numerical ID" required />
+          </div>
+          <div class="input-group">
+            <label for="editName">Updated Name</label>
+            <input type="text" id="editName" placeholder="Leave empty if unchanged" />
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="input-group">
+              <label for="editPrice">Updated Price ($)</label>
+              <input type="number" id="editPrice" min="0" step="0.01" placeholder="Leave empty if unchanged" />
+            </div>
+            <div class="input-group">
+              <label for="editStock">Updated Stock Level</label>
+              <input type="number" id="editStock" min="0" step="1" placeholder="Leave empty if unchanged" />
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="editDescription">Updated Description</label>
+            <textarea id="editDescription" rows="3" placeholder="Leave empty if unchanged"></textarea>
+          </div>
+          <button type="submit" id="submitBtn2" style="background: linear-gradient(90deg, var(--primary), #4f46e5)">Apply Modifications</button>
+        </form>
+      </div>
+
+      <div id="deletePanel" class="form-panel">
+        <form onsubmit="event.preventDefault(); deleteProduct();">
+          <div class="section-title" style="color: var(--danger); ">Remove from Indices</div>
+          <div class="input-group">
+            <label for="deleteId">Target Product ID</label>
+            <input type="number" id="deleteId" min="1" placeholder="Enter product ID to permanently purge" required />
+          </div>
+          <button type="submit" class="btn-danger-action" id="submitBtn3">Permanently Purge Product</button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8080';
+
+    // UI Tab Routing Logic
+    function switchTab(panelId, btnElement) {
+      // Hide all panels
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      // Deactivate all tab selectors
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      // Activate clicked tab and target panel
+      document.getElementById(panelId).classList.add('active');
+      btnElement.classList.add('active');
+      
+      // Clear alert messages during context transitions
+      const el = document.getElementById('result');
+      el.className = 'result';
+      el.innerText = '';
+    }
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeadersWithoutContentType() {
+      const token = getToken();
+      return { ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function parseRoleFromToken(t) {
+      if (!t) return null;
+      try {
+        const parts = String(t).split('.');
+        if (parts.length < 2) return null;
+        const base64Url = parts[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(base64));
+        return payload.role ?? payload.Role ?? payload.user_role ?? payload.userRole ?? null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+    }
+
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    async function createProduct() {
+      try {
+        if (!getToken()) { setResult('Authentication expired.', 'error'); return; }
+
+        const name = document.getElementById('name').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const price = document.getElementById('price').value;
+        const stock = document.getElementById('stock').value;
+        const fileInput = document.getElementById('image');
+        const file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+        if (!file) {
+          setResult('Please select a product image.', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('price', price);
+        formData.append('stock', stock);
+        formData.append('image', file);
+
+        const res = await fetch(`${API_BASE}/seller/products`, {
+          method: 'POST',
+          headers: authHeadersWithoutContentType(),
+          body: formData,
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to add product', 'error'); return; }
+
+        setResult(data.message || 'Product successfully published!', 'success');
+        document.getElementById('name').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('stock').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('image').value = '';
+      } catch { setResult('Network connection error.', 'error'); }
+    }
+
+
+    async function updateProduct() {
+      try {
+        const token = getToken();
+        if (!token) { setResult('Authentication expired.', 'error'); return; }
+
+        const role = parseRoleFromToken(token);
+
+        if (role !== 'seller') {
+          setResult('Forbidden: your account is not a seller (JWT role mismatch).', 'error');
+          return;
+        }
+
+        const id = Number(document.getElementById('editId').value);
+        const input = {};
+
+        const name = document.getElementById('editName').value.trim();
+        const priceRaw = document.getElementById('editPrice').value;
+        const stockRaw = document.getElementById('editStock').value;
+        const desc = document.getElementById('editDescription').value.trim();
+
+        if (name) input.name = name;
+        if (priceRaw !== '') input.price = Number(priceRaw);
+        if (stockRaw !== '') input.stock = Number(stockRaw);
+        if (desc) input.description = desc;
+
+        if (!id || Number.isNaN(id)) {
+          setResult('Invalid product ID.', 'error');
+          return;
+        }
+
+        console.log('updateProduct PUT', `${API_BASE}/seller/products/${id}`, input);
+        const res = await fetch(
+
+          `${API_BASE}/seller/products/${id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify(input),
+          }
+        );
+
+
+
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (_) {
+          // fallback to text so we don't mask backend errors as "network" failures
+        }
+
+        if (!res.ok) {
+          let extra = '';
+          if (!data || typeof data !== 'object') data = {};
+          if (!data.message && !data.error) {
+            // try once more to read body as text for better debugging
+            try {
+              const text = await res.text();
+              extra = text ? ` - ${text}` : '';
+            } catch (_) {}
+          }
+
+          setResult(
+            `Update failed (${res.status}): ${data.message || data.error || 'unknown error'}${extra}`,
+            'error'
+          );
+          return;
+        }
+
+        setResult(data.message || 'Product modified successfully.', 'success');
+        document.getElementById('editId').value = '';
+        document.getElementById('editName').value = '';
+        document.getElementById('editPrice').value = '';
+        document.getElementById('editStock').value = '';
+        document.getElementById('editDescription').value = '';
+      } catch (e) {
+        setResult(`Network transaction failure: ${e?.message || 'unknown error'}`, 'error');
+      }
+    }
+
+
+    async function deleteProduct() {
+      try {
+        if (!getToken()) { setResult('Authentication expired.', 'error'); return; }
+        if (!confirm('Are you completely sure you want to delete this product?')) return;
+
+        const id = Number(document.getElementById('deleteId').value);
+        const res = await fetch(`${API_BASE}/seller/products/${id}`, { method: 'DELETE', headers: authHeadersWithoutContentType() });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to delete product', 'error'); return; }
+
+        setResult(data.message || 'Product permanently deleted.', 'success');
+        document.getElementById('deleteId').value = '';
+      } catch { setResult('Network connectivity error.', 'error'); }
+    }
+
+    window.switchTab = switchTab;
+    window.createProduct = createProduct;
+    window.updateProduct = updateProduct;
+    window.deleteProduct = deleteProduct;
+    window.logout = logout;
+  </script>
+</body>
+</html>

@@ -5,7 +5,11 @@ import "gorm.io/gorm"
 type Order struct {
 	gorm.Model
 
-	User_id      uint
-	Total_amount uint
-	Status       string
+	UserID      uint
+	TotalAmount float64
+	Status      string
+
+	OrderItems []OrderItem
+
+	User User
 }
