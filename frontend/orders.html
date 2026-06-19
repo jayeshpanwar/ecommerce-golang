@@ -4,82 +4,271 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Your Orders - ShopSphere</title>
+  
   <link rel="stylesheet" href="style.css" />
+  
   <style>
-    /* --- Page Specific Structural Overrides --- */
-    .table-responsive-wrapper {
-      background: rgba(15, 23, 42, 0.45);
+    /* Core Design System Variables */
+    :root {
+      --bg-color: #0f172a;
+      --surface: rgba(30, 41, 59, 0.7);
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --danger: #f43f5e;
+      --warning: #fbbf24;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .storefront-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .storefront-header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+    }
+
+    .storefront-header h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    /* --- SLEEK INVENTORY REPLICATED TABS --- */
+    .catalog-tabs-container {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .catalog-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(30, 41, 59, 0.4);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
+      color: var(--muted);
+    }
+
+    .catalog-tab:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+    }
+
+    /* Active Tab Variant matching image_399dcc.png */
+    .catalog-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Count Bubble inside Tabs */
+    .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--muted);
+    }
+
+    .catalog-tab.active .tab-badge {
+      background: rgba(0, 0, 0, 0.2);
+      color: #ffffff;
+    }
+
+    /* --- TABLE STYLING --- */
+    .table-responsive-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       overflow: hidden;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     }
 
     .orders-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
     }
 
     .orders-table th {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(0, 0, 0, 0.2);
       padding: 16px 20px;
       color: var(--muted);
       font-weight: 600;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       border-bottom: 1px solid var(--card-border);
     }
 
     .orders-table td {
-      padding: 18px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: #e2e8f0;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
       vertical-align: middle;
     }
 
-    .orders-table tr:last-child td {
+    /* Interactive Row Styles */
+    .order-row {
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .order-row:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .order-row:last-child td {
       border-bottom: none;
     }
 
-    .orders-table tr:hover td {
-      background: rgba(255, 255, 255, 0.01);
+    .order-id-txt {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 600;
+      color: var(--primary);
     }
 
-    /* Status Badges */
+    .order-total-txt {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    /* Badges */
     .status-badge {
       display: inline-flex;
       align-items: center;
       padding: 4px 10px;
-      border-radius: 30px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
       text-transform: capitalize;
+      letter-spacing: 0.025em;
     }
-    
-    .status-pending { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+    .status-pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
     .status-completed { background: rgba(16, 185, 129, 0.12); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
     .status-cancelled { background: rgba(244, 63, 94, 0.12); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); }
     .status-default { background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid var(--card-border); }
 
-    .item-meta-row {
-      font-size: 0.85rem;
-      color: #94a3b8;
-      line-height: 1.5;
-    }
-    .order-id-txt {
-      font-family: monospace;
-      font-weight: 600;
-      color: var(--primary);
-    }
-    .order-total-txt {
-      font-weight: 700;
+    /* Buttons */
+    .pay-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary);
       color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background-color 0.2s ease;
     }
+
+    .pay-btn:hover { background: var(--primary-hover); }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    .nav-btn:hover { background: rgba(255,255,255,0.05); }
+
+    /* Expanded Items Details */
+    .items-container-wrapper {
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .item-grid-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      align-items: center;
+    }
+
+    .item-row:last-child { border-bottom: none; }
+    
+    .item-name {
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .muted { color: var(--muted); }
+    .text-center { text-align: center; }
+    
+    .chevron {
+      transition: transform 0.3s ease;
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
+      color: var(--muted);
+    }
+    .order-row.expanded .chevron { transform: rotate(180deg); }
+
+    .navbar { padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); background: var(--surface); }
+    .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+    .brand-logo-group { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 1.2rem; }
+    .nav-actions { display: flex; gap: 12px; }
   </style>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
   <div class="ambient-bg"></div>
@@ -87,20 +276,14 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="brand-logo-group">
-        <div class="brand-logo small-logo">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-          </svg>
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="var(--primary)">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
         <span class="nav-brand-name">ShopSphere</span>
       </div>
       <div class="nav-actions">
-        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">
-          ← Back to Store
-        </button>
-        <button type="button" class="nav-btn secondary-btn" onclick="logout(event)" style="color: var(--danger) !important;">
-          Logout
-        </button>
+        <button type="button" class="nav-btn" onclick="window.location.href='products.html'">← Back to Store</button>
+        <button type="button" class="nav-btn" onclick="logout(event)" style="color: var(--danger); border-color: rgba(244, 63, 94, 0.3);">Logout</button>
       </div>
     </div>
   </nav>
@@ -112,16 +295,27 @@
 
     <p id="result" class="result" aria-live="polite"></p>
 
+    <div class="catalog-tabs-container">
+      <button class="catalog-tab active" id="tabPending" onclick="switchTab('pending')">
+        Pending <span id="pendingCount" class="tab-badge">0</span>
+      </button>
+      <button class="catalog-tab" id="tabPaid" onclick="switchTab('paid')">
+        Paid <span id="paidCount" class="tab-badge">0</span>
+      </button>
+    </div>
+
     <div class="table-responsive-wrapper">
       <div style="overflow-x: auto;">
         <table class="orders-table">
           <thead>
             <tr>
+              <th style="width: 40px;"></th>
               <th>Order ID</th>
               <th>Placed Date</th>
-              <th>Status</th>
+              <th>Order Status</th>
+              <th>Payment Status</th>
               <th>Total Amount</th>
-              <th>Items Ordered</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="ordersTbody"></tbody>
@@ -130,9 +324,12 @@
     </div>
   </main>
 
-  <script src="app.js"></script>
   <script>
     const API_BASE = 'http://localhost:8080';
+    
+    // State management variables
+    let allOrders = [];
+    let currentTab = 'pending';
 
     function getToken() { return localStorage.getItem('token'); }
     function authHeaders() {
@@ -145,12 +342,13 @@
       if (!el) return;
       el.className = `result ${type || ''}`;
       el.innerText = message || '';
+      el.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+      el.style.marginBottom = '1rem';
     }
 
-    function renderEmpty(msg) {
-      document.getElementById('ordersTbody').innerHTML = `
-        <tr><td colspan="5" class="muted" style="text-align:center; padding: 40px; font-style: italic;">${msg}</td></tr>
-      `;
+    function clearAuthAndRedirectToLogin() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
     }
 
     function escapeHtml(str) {
@@ -159,168 +357,315 @@
         .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
     }
 
-    function logout(e) {
-      if (e) e.preventDefault();
-      localStorage.removeItem('token');
-      window.location.href = 'login.html'; // Points directly to login.html
-    }
-
-    function stopIfDetailsRowClick(e) {
-      // Prevent the details row from re-triggering the summary row click.
-      e.stopPropagation();
-    }
-
-
     function formatDate(dt) {
       try {
         const d = new Date(dt);
-        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'});
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + ' <span class="muted">' + d.toLocaleTimeString(undefined, {hour: '2-digit', minute:'2-digit'}) + '</span>';
       } catch (_) {
-        return String(dt ?? '');
+        return escapeHtml(dt);
       }
     }
 
-    function getStatusBadgeClass(status) {
-      const normalized = String(status ?? '').toLowerCase();
-      if (normalized.includes('pending') || normalized.includes('process')) return 'status-pending';
-      if (normalized.includes('complete') || normalized.includes('deliver') || normalized.includes('paid') || normalized.includes('accepted')) return 'status-completed';
-      if (normalized.includes('cancel') || normalized.includes('fail') || normalized.includes('reject') || normalized.includes('rejected')) return 'status-cancelled';
+    function paymentBadgeClass(status) {
+      const s = String(status ?? '').toLowerCase();
+      if (s === 'paid' || s === 'success') return 'status-completed';
+      if (s === 'pending') return 'status-pending';
+      if (s === 'failed') return 'status-cancelled';
       return 'status-default';
     }
 
+    function itemStatusClass(status) {
+      const s = String(status ?? '').toLowerCase();
+      if (s.includes('pending')) return 'status-pending';
+      if (s.includes('accept') || s.includes('ship') || s.includes('deliver')) return 'status-completed';
+      if (s.includes('reject') || s.includes('cancel')) return 'status-cancelled';
+      return 'status-default';
+    }
 
-    function clearAuthAndRedirectToLogin() {
-      localStorage.removeItem('token');
-      window.location.href = 'login.html';
+    function getRazorpayFromWindow() {
+      if (!window.Razorpay) throw new Error('Razorpay script not loaded.');
+      return window.Razorpay;
+    }
+
+    // Tab view switcher logic
+    function switchTab(tabType) {
+      currentTab = tabType;
+      
+      // Toggle button active classes visually
+      document.getElementById('tabPending').classList.toggle('active', tabType === 'pending');
+      document.getElementById('tabPaid').classList.toggle('active', tabType === 'paid');
+      
+      // Rerender the active filtered dataset
+      renderOrders();
+    }
+
+    async function payNow(event, orderId) {
+      event.stopPropagation();
+      setResult('', null);
+
+      const token = getToken();
+      if (!token) {
+        setResult('Login required.', 'error');
+        clearAuthAndRedirectToLogin();
+        return;
+      }
+
+      const createRes = await fetch(`${API_BASE}/payments/create-order/${orderId}`, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
+
+      const createData = await createRes.json().catch(() => ({}));
+
+      if (createRes.status === 401) {
+        clearAuthAndRedirectToLogin();
+        return;
+      }
+
+      if (!createRes.ok) {
+        setResult(createData.error || createData.message || 'Failed to create Razorpay order.', 'error');
+        return;
+      }
+
+      const rzpData = createData;
+      const Razorpay = getRazorpayFromWindow();
+
+      const options = {
+        key: rzpData.key,
+        amount: rzpData.amount,
+        currency: rzpData.currency,
+        name: 'ShopSphere',
+        description: `Payment for Order #${orderId}`,
+        order_id: rzpData.razorpay_order_id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch(`${API_BASE}/payments/verify`, {
+              method: 'POST',
+              headers: authHeaders(),
+              body: JSON.stringify({
+                order_id: response.razorpay_order_id,
+                payment_id: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyRes.json().catch(() => ({}));
+            if (!verifyRes.ok) {
+              setResult(verifyData.error || verifyData.message || 'Payment verification failed.', 'error');
+              return;
+            }
+
+            setResult('Payment successful! Order updated.', 'success');
+            await fetchOrders(); // Reload dataset
+          } catch (e) {
+            setResult('Connection error during verification.', 'error');
+          }
+        },
+        theme: { color: '#3b82f6' },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+    async function fetchOrderItems(orderId) {
+      const res = await fetch(`${API_BASE}/orders`, { method: 'GET', headers: authHeaders() });
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const orders = data.data || [];
+      const order = orders.find((x) => String(x.order_id ?? x.OrderID) === String(orderId));
+      return (order && (order.items || [])) || [];
+    }
+
+    function renderOrderItemsTable(orderId, items) {
+      const container = document.querySelector(`#order-items-${CSS.escape(orderId)} .order-items-container`);
+      if (!container) return;
+
+      if (!items || !items.length) {
+        container.innerHTML = `<div class="muted text-center" style="padding: 16px 0;">No items found in this order.</div>`;
+        return;
+      }
+
+      const rows = items.map((it) => {
+        const st = String(it.status ?? it.Status ?? 'pending');
+        const productName = String(it.product_name ?? it.productName ?? it.name ?? it.ProductName ?? 'Unknown Product');
+        const qty = Number(it.quantity ?? it.Quantity ?? 0);
+        const price = Number(it.price ?? it.Price ?? 0);
+        const subtotal = (qty * price).toFixed(2);
+        
+        return `
+          <div class="item-row">
+            <div style="min-width:0;">
+              <div class="item-name">${escapeHtml(productName)}</div>
+              <div class="muted" style="font-size:0.82rem; margin-top: 2px;">Qty: ${escapeHtml(qty)}</div>
+            </div>
+            <div><span class="status-badge ${itemStatusClass(st)}">${escapeHtml(st)}</span></div>
+            <div class="muted">$${escapeHtml(price.toFixed(2))}</div>
+            <div style="font-weight: 600;">$${escapeHtml(subtotal)}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="item-grid-header">
+          <div>Product</div>
+          <div>Status</div>
+          <div>Price</div>
+          <div>Total</div>
+        </div>
+        ${rows}
+      `;
+    }
+
+    async function toggleOrderItems(orderId, forceRefresh) {
+      const masterRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+      const detailsRow = document.getElementById(`order-items-${orderId}`);
+      if (!detailsRow || !masterRow) return;
+
+      const isHidden = detailsRow.style.display === 'none' || !detailsRow.style.display;
+      
+      if (isHidden) {
+        detailsRow.style.display = '';
+        masterRow.classList.add('expanded');
+      } else if (!forceRefresh) {
+        detailsRow.style.display = 'none';
+        masterRow.classList.remove('expanded');
+        return;
+      }
+
+      const container = document.querySelector(`#order-items-${CSS.escape(orderId)} .order-items-container`);
+      if (!container) return;
+
+      if (!forceRefresh && container.dataset.loaded === 'true') return;
+
+      container.dataset.loaded = 'false';
+      container.innerHTML = `<div class="muted text-center" style="padding: 16px 0;">Loading items...</div>`;
+
+      const items = await fetchOrderItems(orderId);
+      container.dataset.loaded = 'true';
+      renderOrderItemsTable(orderId, items);
+    }
+
+    // Handles filtering data inputs and updating HTML output structures
+    function renderOrders() {
+      const tbody = document.getElementById('ordersTbody');
+      
+      // Filter current dataset based on view parameters
+      const filtered = allOrders.filter(o => {
+        const pStatus = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
+        if (currentTab === 'pending') {
+          return pStatus === 'pending' || pStatus === 'failed';
+        } else {
+          return pStatus === 'paid' || pStatus === 'success';
+        }
+      });
+
+      if (filtered.length === 0) {
+        const msg = currentTab === 'pending' 
+          ? 'No pending payments. Everything is caught up! 🎉' 
+          : 'No historical completed transactions found.';
+        tbody.innerHTML = `<tr><td colspan="7" class="muted text-center" style="padding: 40px; font-style: italic;">${msg}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => {
+        const orderId = o.order_id ?? o.OrderID;
+        const orderedAt = o.ordered_at ?? o.OrderedAt;
+        const orderStatus = o.status ?? o.Status;
+        const total = Number(o.total_amount ?? o.TotalAmount ?? 0).toFixed(2);
+        const paymentStatus = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
+        
+        const actionHTML = currentTab === 'pending'
+          ? `<button class="pay-btn" onclick="payNow(event, '${escapeHtml(orderId)}')">Pay Now</button>`
+          : `<span class="muted" style="font-size: 0.85rem; font-weight: 600; color: var(--success);">Paid ✓</span>`;
+
+        return `
+          <tr class="order-row" data-order-id="${escapeHtml(orderId)}" onclick="toggleOrderItems('${escapeHtml(orderId)}', false)">
+            <td>
+              <svg class="chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </td>
+            <td><span class="order-id-txt">#${escapeHtml(orderId)}</span></td>
+            <td>${formatDate(orderedAt)}</td>
+            <td><span class="status-badge status-default">${escapeHtml(orderStatus || '')}</span></td>
+            <td><span class="status-badge ${paymentBadgeClass(paymentStatus)}">${escapeHtml(paymentStatus)}</span></td>
+            <td><span class="order-total-txt">$${escapeHtml(total)}</span></td>
+            <td>${actionHTML}</td>
+          </tr>
+          
+          <tr id="order-items-${escapeHtml(orderId)}" style="display:none;">
+            <td colspan="7" style="padding: 0; border-bottom: 1px solid var(--card-border);">
+              <div class="items-container-wrapper">
+                <div class="items-header">
+                  <div>
+                    <div style="color: var(--text-main); font-weight: 700; margin-bottom: 4px;">Order Summary</div>
+                    <div class="muted" style="font-size: 0.85rem;">Breakdown of products in this order.</div>
+                  </div>
+                </div>
+                <div class="order-items-container"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     async function fetchOrders() {
       const token = getToken();
-      if (!token) {
-        // If token is missing, redirect to login.
-        window.location.href = 'login.html';
-        return;
-      }
+      if (!token) { window.location.href = 'login.html'; return; }
 
+      const tbody = document.getElementById('ordersTbody');
+      tbody.innerHTML = `<tr><td colspan="7" class="muted text-center" style="padding: 40px;">Loading orders...</td></tr>`;
 
       try {
-        setResult('', null);
-        document.getElementById('ordersTbody').innerHTML = `
-          <tr><td colspan="5" class="muted" style="text-align:center; padding: 40px;"><div class="spinner" style="margin: 0 auto 10px;"></div>Loading orders...</td></tr>
-        `;
-
         const res = await fetch(`${API_BASE}/orders`, { method: 'GET', headers: authHeaders() });
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          if (res.status === 401) {
-            clearAuthAndRedirectToLogin();
-            return;
-          }
+          if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
           setResult(data.message || data.error || 'Failed to fetch orders', 'error');
-          renderEmpty('Could not load orders.');
+          tbody.innerHTML = '';
           return;
         }
 
-        const orders = data.data || [];
-        if (!orders || !Array.isArray(orders) || orders.length === 0) {
-          renderEmpty('You have no orders recorded yet.');
-          return;
-        }
+        allOrders = data.data || [];
 
-        const rows = orders.map((o, idx) => {
-          const orderId = o.order_id ?? o.OrderID ?? '';
-          const orderedAt = o.ordered_at ?? o.OrderedAt ?? '';
-          const rawStatus = o.status ?? o.Status ?? o.order_status ?? o.OrderStatus ?? 'Pending';
-          const total = Number(o.total_amount ?? o.TotalAmount ?? o.price ?? 0).toFixed(2);
-          const items = Array.isArray(o.items) ? o.items : [];
+        // Dynamic badge count updates
+        const pendingCount = allOrders.filter(o => {
+          const s = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
+          return s === 'pending' || s === 'failed';
+        }).length;
 
-          // Item-by-item status (from backend: items[].status)
-          const itemsDetailsHtml = items.length
-            ? items.map((it) => {
-                const name = escapeHtml(it.product_name ?? it.ProductName ?? '');
-                const qty = Number(it.quantity ?? it.Quantity ?? 0);
-                const itemStatus = it.status ?? it.Status ?? 'pending';
-                const statusClass = getStatusBadgeClass(itemStatus);
-                return `
-                  <div class="item-meta-row" style="display:flex; align-items:center; justify-content:space-between; gap: 12px;">
-                    <div>
-                      <div style="font-weight:700; color:#fff;">${name}</div>
-                      <div class="muted" style="font-size:0.85rem; color:#94a3b8; margin-top:3px;">Qty: ${qty}</div>
-                    </div>
-                    <span class="status-badge ${statusClass}">${escapeHtml(itemStatus)}</span>
-                  </div>
-                `;
-              }).join('')
-            : '<span class="muted">No item breakdown found</span>';
+        const paidCount = allOrders.filter(o => {
+          const s = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
+          return s === 'paid' || s === 'success';
+        }).length;
 
-          const rowKey = `order_${orderId || idx}`;
+        document.getElementById('pendingCount').innerText = pendingCount;
+        document.getElementById('paidCount').innerText = paidCount;
 
-          return `
-            <tr class="order-summary-row" data-order-key="${escapeHtml(rowKey)}" style="cursor:pointer;">
-              <td><span class="order-id-txt">#${escapeHtml(orderId)}</span></td>
-              <td>${escapeHtml(formatDate(orderedAt))}</td>
-              <td><span class="status-badge ${getStatusBadgeClass(rawStatus)}">${escapeHtml(rawStatus)}</span></td>
-              <td><span class="order-total-txt">$${escapeHtml(total)}</span></td>
-              <td>
-                <span class="muted">Click to view item statuses</span>
-              </td>
-            </tr>
-            <tr class="order-details-row" data-order-details="${escapeHtml(rowKey)}" style="display:none;" onclick="stopIfDetailsRowClick(event)">
-              <td colspan="5">
-                <div class="item-meta-row" style="color:#e2e8f0; padding: 12px 0;">
-                  ${itemsDetailsHtml}
-                </div>
-              </td>
-            </tr>
-
-          `;
-        }).join('');
-
-        const tbody = document.getElementById('ordersTbody');
-        tbody.innerHTML = rows;
-
-        // Bind expand/collapse click handlers (row-level details)
-        document.querySelectorAll('.order-summary-row').forEach((row) => {
-          row.addEventListener('click', () => {
-            const key = row.getAttribute('data-order-key');
-            document.querySelectorAll('.order-details-row').forEach((d) => {
-              const dk = d.getAttribute('data-order-details');
-              if (dk === key) {
-                d.style.display = d.style.display === 'none' ? '' : 'none';
-              }
-            });
-          });
-        });
+        // Render current selected partition mapping
+        renderOrders();
 
       } catch (e) {
         console.error(e);
         setResult('Network error while loading orders.', 'error');
-        renderEmpty('Network error.');
+        tbody.innerHTML = `<tr><td colspan="7" class="muted text-center" style="padding: 40px;">Failed to load data.</td></tr>`;
       }
     }
 
-    // Fixed safeguard redirect logic
-    (function redirectIfSeller() {
-      const token = getToken();
-      if (!token) return;
-      try {
-        const base64Url = token.split('.')[1];
-        if (!base64Url) return;
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const payload = JSON.parse(atob(base64));
-        const userRole = payload.role ?? payload.Role ?? 'customer';
-        if (userRole === 'seller') { 
-          window.location.href = 'seller_products.html'; 
-        }
-      } catch (e) {
-        console.error("Token structure verification bypassed:", e);
-      }
-    })();
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
 
     fetchOrders();
     window.fetchOrders = fetchOrders;
+    window.payNow = payNow;
     window.logout = logout;
+    window.switchTab = switchTab;
   </script>
 </body>
 </html>

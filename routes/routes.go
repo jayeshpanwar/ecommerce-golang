@@ -66,7 +66,9 @@ func SetupRoutes(router *gin.Engine) {
 		user.POST("/orders", controllers.CreateOrder)
 		user.GET("/orders", controllers.ViewOrders)
 		user.POST("/payments/create-order/:order_id", controllers.CreatePaymentOrder)
+		user.POST("/payments/verify", controllers.VerifyPayment)
 		user.GET("/orders/:id/payments", controllers.GetPaymentDetails)
+
 		//user.POST("/reviews", controllers.CreateReview)
 
 		//user.GET("/profile", controllers.Profile)

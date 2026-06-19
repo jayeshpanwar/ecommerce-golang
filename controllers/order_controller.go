@@ -156,8 +156,6 @@ func CreateOrder(c *gin.Context) {
 				return err
 			}
 
-			product.Stock -= int(item.Quantity)
-
 			if err := tx.Save(&product).Error; err != nil {
 				c.JSON(500, gin.H{"error": err.Error()})
 				return err
@@ -175,9 +173,11 @@ func CreateOrder(c *gin.Context) {
 		}
 
 		c.JSON(201, gin.H{
-			"message":  "Order placed successfully",
-			"order_id": order.ID,
-			"total":    order.TotalAmount,
+			"message":        "Order placed successfully",
+			"order_id":       order.ID,
+			"total":          order.TotalAmount,
+			"payment_status": order.PaymentStatus,
+			"status":         order.Status,
 		})
 		return nil
 	})
@@ -201,11 +201,12 @@ func ViewOrders(c *gin.Context) {
 	}
 
 	type OrderResponse struct {
-		OrderID     uint                `json:"order_id"`
-		OrderedAt   time.Time           `json:"ordered_at"`
-		TotalAmount float64             `json:"total_amount"`
-		Status      string              `json:"status"`
-		Items       []OrderItemResponse `json:"items"`
+		OrderID       uint                `json:"order_id"`
+		OrderedAt     time.Time           `json:"ordered_at"`
+		TotalAmount   float64             `json:"total_amount"`
+		Status        string              `json:"status"`
+		PaymentStatus string              `json:"payment_status"`
+		Items         []OrderItemResponse `json:"items"`
 	}
 
 	var orders []models.Order
@@ -235,11 +236,12 @@ func ViewOrders(c *gin.Context) {
 		}
 
 		response = append(response, OrderResponse{
-			OrderID:     order.ID,
-			OrderedAt:   order.CreatedAt,
-			TotalAmount: order.TotalAmount,
-			Status:      order.Status,
-			Items:       items,
+			OrderID:       order.ID,
+			OrderedAt:     order.CreatedAt,
+			TotalAmount:   order.TotalAmount,
+			Status:        order.Status,
+			Items:         items,
+			PaymentStatus: order.PaymentStatus,
 		})
 	}
 	c.JSON(200, gin.H{
@@ -257,8 +259,9 @@ func GetSellerOrders(c *gin.Context) {
 	var orderItems []models.OrderItem
 
 	if err := config.DB.
-		Where("seller_id = ?", sellerID).
-		Order("created_at DESC").
+		Joins("Order").
+		Where("order_items.seller_id = ? AND Order.payment_status = ?", sellerID, "paid").
+		Order("order_items.created_at DESC").
 		Preload("Product").
 		Preload("Order.User").
 		Find(&orderItems).Error; err != nil {

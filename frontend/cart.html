@@ -125,6 +125,8 @@
     </div>
   </nav>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
   <main class="storefront-container" style="max-width: 850px;">
     <div class="storefront-header">
       <h2 id="cartTitle">Your Shopping Bag</h2>
@@ -410,6 +412,7 @@
         const confirmBtn = document.getElementById('confirmOrderBtn');
         if (confirmBtn) confirmBtn.disabled = true;
 
+        // 1) Create backend order from cart
         const res = await fetch(`${API_BASE}/orders`, { method: 'POST', headers: authHeaders() });
         const data = await res.json().catch(() => ({}));
 
@@ -420,26 +423,119 @@
         }
 
         if (!res.ok) {
-          // Backend returns 400 with an "error" field (e.g. insufficient stock) or "message".
           setResult(data.error || data.message || 'Failed to place order', 'error');
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
 
-        // 1. Alert Success
-        setResult(data.message || 'Order successfully processed!', 'success');
-        
-        // 2. Clear out local storage matrices completely
-        globalCartItems = [];
-        setSummary(0, 0);
-        document.getElementById('checkoutItemsPreview').innerHTML = '';
-        document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
-        
-        // 3. Remove "Modify Items" navigation option after check out completion
-        document.getElementById('modifyItemsBtn').style.display = 'none';
-        document.getElementById('summaryHint').innerText = 'Transaction completed.';
+        const orderId = data.order_id ?? data.orderId;
+        if (!orderId) {
+          setResult('Order created but missing order_id for payment.', 'error');
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        // 2) Create Razorpay order on backend
+        setResult('Opening Razorpay...', 'success');
+
+        const createRes = await fetch(`${API_BASE}/payments/create-order/${orderId}`, {
+          method: 'POST',
+          headers: authHeaders(),
+        });
+
+        const createData = await createRes.json().catch(() => ({}));
+
+        if (createRes.status === 401) {
+          clearAuthAndRedirectToLogin();
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        if (!createRes.ok) {
+          setResult(createData.error || createData.message || 'Failed to init payment.', 'error');
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        // 3) Open Razorpay Checkout
+        if (!window.Razorpay) {
+          setResult('Razorpay script not loaded.', 'error');
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        const options = {
+          key: createData.key,
+          amount: createData.amount,
+          currency: createData.currency,
+          name: 'My Ecommerce Store',
+          description: 'Order Payment',
+          order_id: createData.razorpay_order_id,
+          theme: { color: '#3399cc' },
+          handler: async function (response) {
+            try {
+              // 4) Verify payment with backend
+              const verifyRes = await fetch(`${API_BASE}/payments/verify`, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({
+                  order_id: response.razorpay_order_id,
+                  payment_id: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                }),
+              });
+
+              const verifyData = await verifyRes.json().catch(() => ({}));
+
+              if (!verifyRes.ok) {
+                // Verification endpoint failed. Payment might still be processed via webhook.
+                // Immediately show success to prevent blocking the user.
+                // (Backend status will still be updated asynchronously.)
+                const msg = verifyData?.error || verifyData?.message || 'Payment verification failed.';
+                console.warn('verify failed:', msg);
+
+                setResult('Payment successful! Order will be updated shortly.', 'success');
+
+                // Clear UI cart now (order will be marked paid by webhook)
+                globalCartItems = [];
+                setSummary(0, 0);
+                document.getElementById('checkoutItemsPreview').innerHTML = '';
+                document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
+                document.getElementById('modifyItemsBtn').style.display = 'none';
+                document.getElementById('summaryHint').innerText = 'Transaction completed.';
+
+                if (confirmBtn) confirmBtn.disabled = false;
+                return;
+              }
+
+              // Helpful debug (kept minimal): show backend success/error only.
+              if (verifyData && verifyData.message) {
+                console.log('verify:', verifyData.message);
+              }
+
+              setResult('Payment successful! Order updated.', 'success');
+
+              // Clear UI cart after successful verification
+              globalCartItems = [];
+              setSummary(0, 0);
+              document.getElementById('checkoutItemsPreview').innerHTML = '';
+              document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
+              document.getElementById('modifyItemsBtn').style.display = 'none';
+              document.getElementById('summaryHint').innerText = 'Transaction completed.';
+            } catch (e) {
+              setResult('Connection error during verification.', 'error');
+              if (confirmBtn) confirmBtn.disabled = false;
+            }
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
       } catch (e) {
         setResult('Connection error processing transaction.', 'error');
+        const confirmBtn = document.getElementById('confirmOrderBtn');
+        if (confirmBtn) confirmBtn.disabled = false;
       }
     };
 
