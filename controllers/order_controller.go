@@ -124,7 +124,11 @@ func CreateOrder(c *gin.Context) {
 			total += product.Price * float64(item.Quantity)
 		}
 
-		order := models.Order{UserID: userID, TotalAmount: total, Status: "pending"}
+		order := models.Order{UserID: userID,
+			TotalAmount:   total,
+			Status:        "pending",
+			PaymentStatus: "pending",
+		}
 		if err := tx.Create(&order).Error; err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return err
