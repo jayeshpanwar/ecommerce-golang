@@ -8,26 +8,63 @@
   <link rel="stylesheet" href="style.css" />
   
   <style>
-    /* Core Design System Variables */
+    /* --- E-commerce Optimized Overrides (Amazon/Flipkart Inspired) --- */
     :root {
-      --bg-color: #0f172a;
-      --surface: rgba(30, 41, 59, 0.7);
-      --card-border: #334155;
-      --text-main: #f8fafc;
-      --muted: #94a3b8;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --success: #10b981;
-      --danger: #f43f5e;
-      --warning: #fbbf24;
+      --bg-color: #f1f3f6; /* Classic Flipkart light background */
+      --surface: #ffffff;  /* High-contrast crisp white panels */
+      --card-border: #e0e0e0;
+      --text-main: #212121;
+      --muted: #878787;
+      --primary: #2874f0;  /* Flipkart Blue Accent */
+      --primary-hover: #145cc5;
+      --success: #388e3c;  /* Verified Marketplace Green */
+      --danger: #d32f2f;   /* Error/Failed Alert Crimson */
+      --warning: #ff9f00;  /* Amazon/Flipkart Orange Attention Warning */
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
+    }
+
+    .ambient-bg {
+      display: none; /* Disabling legacy dark ambient effects */
+    }
+
+    /* Navbar Clean White Theme Styling */
+    .navbar {
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--card-border);
+      background: var(--surface);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .brand-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 1.4rem;
+    }
+    
+    .nav-brand-name {
+      color: var(--primary);
+    }
+    
+    .nav-actions {
+      display: flex;
+      gap: 12px;
     }
 
     .storefront-container {
@@ -37,82 +74,77 @@
     }
 
     .storefront-header {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       border-bottom: 1px solid var(--card-border);
       padding-bottom: 1rem;
     }
 
     .storefront-header h2 {
       margin: 0;
-      font-size: 1.75rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      letter-spacing: -0.025em;
+      color: var(--text-main);
     }
 
-    /* --- SLEEK INVENTORY REPLICATED TABS --- */
+    /* --- CLEAN MARKETPLACE TABS --- */
     .catalog-tabs-container {
       display: flex;
-      gap: 12px;
-      margin-bottom: 1.5rem;
+      gap: 8px;
+      margin-bottom: 1rem;
     }
 
     .catalog-tab {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 20px;
-      border-radius: 12px;
+      padding: 12px 24px;
+      border-radius: 4px;
       font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      background: rgba(30, 41, 59, 0.4);
+      background: #ffffff;
       border: 1px solid var(--card-border);
-      color: var(--muted);
-    }
-
-    .catalog-tab:hover {
-      background: rgba(255, 255, 255, 0.03);
       color: var(--text-main);
     }
 
-    /* Active Tab Variant matching image_399dcc.png */
-    .catalog-tab.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    .catalog-tab:hover {
+      background: #f9f9f9;
     }
 
-    /* Count Bubble inside Tabs */
+    .catalog-tab.active {
+      background: #ffffff;
+      border-color: var(--primary);
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+
     .tab-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 20px;
-      height: 20px;
+      min-width: 22px;
+      height: 22px;
       padding: 0 6px;
-      border-radius: 50%;
+      border-radius: 12px;
       font-size: 0.75rem;
       font-weight: 700;
-      background: rgba(0, 0, 0, 0.3);
-      color: var(--muted);
+      background: #f0f0f0;
+      color: #555555;
     }
 
     .catalog-tab.active .tab-badge {
-      background: rgba(0, 0, 0, 0.2);
+      background: var(--primary);
       color: #ffffff;
     }
 
-    /* --- TABLE STYLING --- */
+    /* --- DATA TABLE SURFACE --- */
     .table-responsive-wrapper {
       background: var(--surface);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border-radius: 4px;
       overflow: hidden;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .orders-table {
@@ -123,31 +155,30 @@
     }
 
     .orders-table th {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 16px 20px;
-      color: var(--muted);
+      background: #f1f3f6;
+      padding: 14px 20px;
+      color: #666666;
       font-weight: 600;
       font-size: 0.8rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.03em;
       border-bottom: 1px solid var(--card-border);
     }
 
     .orders-table td {
       padding: 16px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid #f0f0f0;
       color: var(--text-main);
       vertical-align: middle;
     }
 
-    /* Interactive Row Styles */
     .order-row {
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.15s ease;
     }
 
     .order-row:hover {
-      background: rgba(255, 255, 255, 0.03);
+      background: #f9f9f9;
     }
 
     .order-row:last-child td {
@@ -155,66 +186,67 @@
     }
 
     .order-id-txt {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: inherit;
       font-weight: 600;
       color: var(--primary);
     }
 
     .order-total-txt {
-      font-weight: 600;
+      font-weight: 700;
       font-size: 1.05rem;
     }
 
-    /* Badges */
+    /* Marketplace Status Badges */
     .status-badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 10px;
-      border-radius: 20px;
+      padding: 4px 12px;
+      border-radius: 4px;
       font-size: 0.75rem;
       font-weight: 600;
-      text-transform: capitalize;
-      letter-spacing: 0.025em;
+      text-transform: uppercase;
     }
 
-    .status-pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
-    .status-completed { background: rgba(16, 185, 129, 0.12); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-    .status-cancelled { background: rgba(244, 63, 94, 0.12); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); }
-    .status-default { background: rgba(255, 255, 255, 0.06); color: var(--muted); border: 1px solid var(--card-border); }
+    .status-pending { background: #fff8e1; color: #b78103; border: 1px solid #ffe082; }
+    .status-completed { background: #e8f5e9; color: var(--success); border: 1px solid #c8e6c9; }
+    .status-cancelled { background: #ffebee; color: var(--danger); border: 1px solid #ffcdd2; }
+    .status-default { background: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
 
-    /* Buttons */
+    /* Action Call to Actions */
     .pay-btn {
       padding: 8px 16px;
-      border-radius: 8px;
+      border-radius: 4px;
       border: none;
-      background: var(--primary);
+      background: var(--warning);
       color: #fff;
       cursor: pointer;
       font-weight: 600;
       font-size: 0.85rem;
-      transition: background-color 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      transition: background-color 0.15s ease;
     }
 
-    .pay-btn:hover { background: var(--primary-hover); }
+    .pay-btn:hover { background: #e68a00; }
 
     .nav-btn {
       padding: 8px 16px;
-      border-radius: 8px;
+      border-radius: 4px;
       border: 1px solid var(--card-border);
-      background: transparent;
+      background: #ffffff;
       color: var(--text-main);
       cursor: pointer;
       font-size: 0.9rem;
-      transition: all 0.2s;
+      font-weight: 500;
+      transition: all 0.15s;
     }
     
-    .nav-btn:hover { background: rgba(255,255,255,0.05); }
+    .nav-btn:hover { background: #f5f5f5; }
 
-    /* Expanded Items Details */
+    /* --- EXPANDED SUB-ITEM PANEL BREAKDOWN --- */
     .items-container-wrapper {
-      padding: 16px 20px;
-      background: rgba(0, 0, 0, 0.15);
-      border-radius: 0 0 8px 8px;
+      padding: 24px;
+      background: #fafafa;
+      border-top: 1px solid #eee;
     }
 
     .item-grid-header {
@@ -224,36 +256,97 @@
       color: var(--muted);
       font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       font-weight: 700;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--card-border);
+    }
+
+    .item-wrapper-block {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 0;
+    }
+
+    .item-wrapper-block:last-child {
+      border-bottom: none;
     }
 
     .item-row {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: 16px;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       align-items: center;
     }
-
-    .item-row:last-child { border-bottom: none; }
     
     .item-name {
       font-weight: 600;
       color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.95rem;
+    }
+
+    /* --- SEAMLESS HORIZONTAL/VERTICAL DELIVERY TIMELINE --- */
+    .item-timeline-box {
+      margin-top: 16px;
+      margin-left: 8px;
+      padding-left: 20px;
+      border-left: 2px solid #e0e0e0;
+    }
+
+    .timeline-header-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      margin-bottom: 12px;
+    }
+
+    .item-history-step {
+      position: relative;
+      padding-bottom: 16px;
+    }
+
+    .item-history-step:last-child {
+      padding-bottom: 0;
+    }
+
+    .item-history-dot {
+      position: absolute;
+      left: -26px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #bdbdbd;
+      border: 2px solid #fafafa;
+    }
+
+    .item-history-step:first-child .item-history-dot {
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.2);
+    }
+
+    .item-history-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+    }
+
+    .item-history-title {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .item-history-at {
+      font-size: 0.8rem;
+      color: var(--muted);
     }
 
     .muted { color: var(--muted); }
     .text-center { text-align: center; }
     
     .chevron {
-      transition: transform 0.3s ease;
+      transition: transform 0.2s ease;
       width: 16px;
       height: 16px;
       display: inline-block;
@@ -261,11 +354,6 @@
       color: var(--muted);
     }
     .order-row.expanded .chevron { transform: rotate(180deg); }
-
-    .navbar { padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); background: var(--surface); }
-    .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
-    .brand-logo-group { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 1.2rem; }
-    .nav-actions { display: flex; gap: 12px; }
   </style>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -283,7 +371,7 @@
       </div>
       <div class="nav-actions">
         <button type="button" class="nav-btn" onclick="window.location.href='products.html'">← Back to Store</button>
-        <button type="button" class="nav-btn" onclick="logout(event)" style="color: var(--danger); border-color: rgba(244, 63, 94, 0.3);">Logout</button>
+        <button type="button" class="nav-btn" onclick="logout(event)" style="color: var(--danger); border-color: rgba(211, 47, 47, 0.4);">Logout</button>
       </div>
     </div>
   </nav>
@@ -297,10 +385,10 @@
 
     <div class="catalog-tabs-container">
       <button class="catalog-tab active" id="tabPending" onclick="switchTab('pending')">
-        Pending <span id="pendingCount" class="tab-badge">0</span>
+        Payment Pending <span id="pendingCount" class="tab-badge">0</span>
       </button>
       <button class="catalog-tab" id="tabPaid" onclick="switchTab('paid')">
-        Paid <span id="paidCount" class="tab-badge">0</span>
+        Orders Placed <span id="paidCount" class="tab-badge">0</span>
       </button>
     </div>
 
@@ -327,7 +415,6 @@
   <script>
     const API_BASE = 'http://localhost:8080';
     
-    // State management variables
     let allOrders = [];
     let currentTab = 'pending';
 
@@ -344,6 +431,7 @@
       el.innerText = message || '';
       el.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
       el.style.marginBottom = '1rem';
+      el.style.fontWeight = '500';
     }
 
     function clearAuthAndRedirectToLogin() {
@@ -368,7 +456,7 @@
 
     function paymentBadgeClass(status) {
       const s = String(status ?? '').toLowerCase();
-      if (s === 'paid' || s === 'success') return 'status-completed';
+      if (s === 'paid' || s === 'success' || s === 'cod') return 'status-completed';
       if (s === 'pending') return 'status-pending';
       if (s === 'failed') return 'status-cancelled';
       return 'status-default';
@@ -387,16 +475,43 @@
       return window.Razorpay;
     }
 
-    // Tab view switcher logic
     function switchTab(tabType) {
       currentTab = tabType;
-      
-      // Toggle button active classes visually
       document.getElementById('tabPending').classList.toggle('active', tabType === 'pending');
       document.getElementById('tabPaid').classList.toggle('active', tabType === 'paid');
-      
-      // Rerender the active filtered dataset
       renderOrders();
+    }
+
+    async function payCOD(event, orderId) {
+      event.stopPropagation();
+      setResult('', null);
+
+      const token = getToken();
+      if (!token) {
+        setResult('Login required.', 'error');
+        clearAuthAndRedirectToLogin();
+        return;
+      }
+
+      const codRes = await fetch(`${API_BASE}/payment/COD/${orderId}`, {
+        method: 'POST',
+        headers: authHeaders(),
+      });
+
+      const codData = await codRes.json().catch(() => ({}));
+
+      if (codRes.status === 401) {
+        clearAuthAndRedirectToLogin();
+        return;
+      }
+
+      if (!codRes.ok) {
+        setResult(codData.error || codData.message || 'Failed to place COD order.', 'error');
+        return;
+      }
+
+      setResult('COD order placed successfully! Pay on delivery.', 'success');
+      await fetchOrders();
     }
 
     async function payNow(event, orderId) {
@@ -456,12 +571,12 @@
             }
 
             setResult('Payment successful! Order updated.', 'success');
-            await fetchOrders(); // Reload dataset
+            await fetchOrders();
           } catch (e) {
             setResult('Connection error during verification.', 'error');
           }
         },
-        theme: { color: '#3b82f6' },
+        theme: { color: '#2874f0' },
       };
 
       const rzp = new Razorpay(options);
@@ -477,7 +592,47 @@
       return (order && (order.items || [])) || [];
     }
 
-    function renderOrderItemsTable(orderId, items) {
+    async function fetchOrderTracking(orderId) {
+      const res = await fetch(`${API_BASE}/orders/${encodeURIComponent(orderId)}/tracking`, { method: 'GET', headers: authHeaders() });
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      return data.history || [];
+    }
+
+    function normalizeHistoryEvent(ev) {
+      const t = String(ev.type ?? ev.status ?? ev.event ?? ev.name ?? '').toLowerCase();
+      const ts = ev.created_at ?? ev.timestamp ?? ev.time ?? ev.ordered_at ?? ev.date ?? null;
+
+      return {
+        type: String(ev.type ?? ev.status ?? ev.event ?? ev.name ?? ev.order_status ?? ev.OrderStatus ?? '').trim() || (t ? t : 'status'),
+        at: ts,
+        productId: ev.product_id ?? ev.productId ?? null,
+        productName: ev.product_name ?? ev.productName ?? null
+      };
+    }
+
+    function orderHistoryLabel(type) {
+      const s = String(type ?? '').toLowerCase();
+      if (s.includes('pending')) return 'Order placed';
+      if (s.includes('accept')) return 'Accepted & Processing';
+      if (s.includes('rejected') || s.includes('reject')) return 'Rejected';
+      if (s.includes('ship')) return 'Shipped Out';
+      if (s.includes('deliver')) return 'Delivered successfully';
+      return String(type ?? 'Status Update');
+    }
+
+    function formatHistoryAt(at) {
+      if (!at) return '';
+      try {
+        const d = new Date(at);
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) +
+          ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      } catch (_) {
+        return escapeHtml(at);
+      }
+    }
+
+    function renderOrderItemsAndHistory(orderId, items, history) {
       const container = document.querySelector(`#order-items-${CSS.escape(orderId)} .order-items-container`);
       if (!container) return;
 
@@ -486,34 +641,82 @@
         return;
       }
 
-      const rows = items.map((it) => {
+      const normalizedHistory = (history || []).map(normalizeHistoryEvent);
+
+      const itemsBlocksHTML = items.map((it) => {
         const st = String(it.status ?? it.Status ?? 'pending');
-        const productName = String(it.product_name ?? it.productName ?? it.name ?? it.ProductName ?? 'Unknown Product');
+        const pName = String(it.product_name ?? it.productName ?? it.name ?? it.ProductName ?? 'Unknown Product');
+        const pId = it.product_id ?? it.productId ?? null;
         const qty = Number(it.quantity ?? it.Quantity ?? 0);
         const price = Number(it.price ?? it.Price ?? 0);
         const subtotal = (qty * price).toFixed(2);
-        
-        return `
-          <div class="item-row">
-            <div style="min-width:0;">
-              <div class="item-name">${escapeHtml(productName)}</div>
-              <div class="muted" style="font-size:0.82rem; margin-top: 2px;">Qty: ${escapeHtml(qty)}</div>
+
+        let filteredHistory = normalizedHistory.filter(ev => {
+          if (pId && ev.productId && String(ev.productId) === String(pId)) return true;
+          if (ev.productName && pName.toLowerCase() === String(ev.productName).toLowerCase()) return true;
+          return false;
+        });
+
+        if (filteredHistory.length === 0) {
+          filteredHistory = normalizedHistory;
+        }
+
+        const historyRowsHTML = filteredHistory.map((ev) => {
+          const label = orderHistoryLabel(ev.type);
+          const at = formatHistoryAt(ev.at);
+          return `
+            <div class="item-history-step">
+              <div class="item-history-dot" aria-hidden="true"></div>
+              <div class="item-history-content">
+                <div class="item-history-title">${escapeHtml(label)}</div>
+                ${at ? `<div class="item-history-at">${escapeHtml(at)}</div>` : ''}
+              </div>
             </div>
-            <div><span class="status-badge ${itemStatusClass(st)}">${escapeHtml(st)}</span></div>
-            <div class="muted">$${escapeHtml(price.toFixed(2))}</div>
-            <div style="font-weight: 600;">$${escapeHtml(subtotal)}</div>
+          `;
+        }).join('');
+
+        const timelineContainerHTML = filteredHistory.length 
+          ? `
+            <div class="item-timeline-box">
+              <div class="timeline-header-title">Item Tracking Timeline</div>
+              <div class="item-timeline-flow">${historyRowsHTML}</div>
+            </div>
+          ` 
+          : `<div class="muted" style="font-size:0.8rem; margin-top:8px; padding-left:12px;">No specific timeline available for this item.</div>`;
+
+        const isDelivered = String(st ?? '').toLowerCase().includes('deliver') || String(st ?? '').toLowerCase().includes('delivered');
+
+        return `
+          <div class="item-wrapper-block">
+            <div class="item-row">
+              <div style="min-width:0;">
+                <div class="item-name">${escapeHtml(pName)}</div>
+                <div class="muted" style="font-size:0.82rem; margin-top: 4px;">Quantity Ordered: ${escapeHtml(qty)}</div>
+
+                ${isDelivered && pId ? `
+                  <div style="margin-top:10px;">
+                    <button class="nav-btn" style="padding: 6px 12px; font-size: 0.8rem;" onclick="window.location.href='review_products.html?orderId=${encodeURIComponent(escapeHtml(orderId))}&productId=${encodeURIComponent(escapeHtml(pId))}&productName=${encodeURIComponent(escapeHtml(pName))}'">Leave review</button>
+                  </div>
+                ` : ''}
+              </div>
+              <div><span class="status-badge ${itemStatusClass(st)}">${escapeHtml(st)}</span></div>
+              <div class="muted">$${escapeHtml(price.toFixed(2))}</div>
+              <div style="font-weight: 600;">$${escapeHtml(subtotal)}</div>
+            </div>
+            
+            ${timelineContainerHTML}
           </div>
         `;
       }).join('');
 
       container.innerHTML = `
         <div class="item-grid-header">
-          <div>Product</div>
-          <div>Status</div>
-          <div>Price</div>
-          <div>Total</div>
+          <div>Product Details</div>
+          <div>Current Status</div>
+          <div>Unit Price</div>
+          <div>Subtotal</div>
         </div>
-        ${rows}
+        ${itemsBlocksHTML}
       `;
     }
 
@@ -523,7 +726,7 @@
       if (!detailsRow || !masterRow) return;
 
       const isHidden = detailsRow.style.display === 'none' || !detailsRow.style.display;
-      
+
       if (isHidden) {
         detailsRow.style.display = '';
         masterRow.classList.add('expanded');
@@ -539,24 +742,30 @@
       if (!forceRefresh && container.dataset.loaded === 'true') return;
 
       container.dataset.loaded = 'false';
-      container.innerHTML = `<div class="muted text-center" style="padding: 16px 0;">Loading items...</div>`;
+      container.innerHTML = `<div class="muted text-center" style="padding: 16px 0;">Loading item breakdown and tracking history...</div>`;
 
-      const items = await fetchOrderItems(orderId);
-      container.dataset.loaded = 'true';
-      renderOrderItemsTable(orderId, items);
+      try {
+        const [items, history] = await Promise.all([
+          fetchOrderItems(orderId),
+          fetchOrderTracking(orderId)
+        ]);
+
+        container.dataset.loaded = 'true';
+        renderOrderItemsAndHistory(orderId, items, history);
+      } catch (err) {
+        container.innerHTML = `<div class="muted text-center" style="padding: 16px 0; color:var(--danger)">Error loading order history logs.</div>`;
+      }
     }
 
-    // Handles filtering data inputs and updating HTML output structures
     function renderOrders() {
       const tbody = document.getElementById('ordersTbody');
       
-      // Filter current dataset based on view parameters
       const filtered = allOrders.filter(o => {
         const pStatus = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
         if (currentTab === 'pending') {
           return pStatus === 'pending' || pStatus === 'failed';
         } else {
-          return pStatus === 'paid' || pStatus === 'success';
+          return pStatus === 'paid' || pStatus === 'success' || pStatus === 'cod';
         }
       });
 
@@ -576,8 +785,13 @@
         const paymentStatus = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
         
         const actionHTML = currentTab === 'pending'
-          ? `<button class="pay-btn" onclick="payNow(event, '${escapeHtml(orderId)}')">Pay Now</button>`
-          : `<span class="muted" style="font-size: 0.85rem; font-weight: 600; color: var(--success);">Paid ✓</span>`;
+          ? `
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="pay-btn" style="background:#64748b;" onclick="payCOD(event, '${escapeHtml(orderId)}')">Pay via COD</button>
+                <button class="pay-btn" onclick="payNow(event, '${escapeHtml(orderId)}')">Pay via Razorpay</button>
+              </div>
+            `
+          : `<span class="muted" style="font-size: 0.85rem; font-weight: 600; color: var(--success);">Order Placed ✓</span>`;
 
         return `
           <tr class="order-row" data-order-id="${escapeHtml(orderId)}" onclick="toggleOrderItems('${escapeHtml(orderId)}', false)">
@@ -597,13 +811,7 @@
           <tr id="order-items-${escapeHtml(orderId)}" style="display:none;">
             <td colspan="7" style="padding: 0; border-bottom: 1px solid var(--card-border);">
               <div class="items-container-wrapper">
-                <div class="items-header">
-                  <div>
-                    <div style="color: var(--text-main); font-weight: 700; margin-bottom: 4px;">Order Summary</div>
-                    <div class="muted" style="font-size: 0.85rem;">Breakdown of products in this order.</div>
-                  </div>
-                </div>
-                <div class="order-items-container"></div>
+                <div class="order-items-container" data-order-id="${escapeHtml(orderId)}"></div>
               </div>
             </td>
           </tr>
@@ -631,7 +839,6 @@
 
         allOrders = data.data || [];
 
-        // Dynamic badge count updates
         const pendingCount = allOrders.filter(o => {
           const s = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
           return s === 'pending' || s === 'failed';
@@ -639,13 +846,12 @@
 
         const paidCount = allOrders.filter(o => {
           const s = String(o.payment_status ?? o.PaymentStatus ?? 'pending').toLowerCase();
-          return s === 'paid' || s === 'success';
+          return s === 'paid' || s === 'success' || s === 'cod';
         }).length;
 
         document.getElementById('pendingCount').innerText = pendingCount;
         document.getElementById('paidCount').innerText = paidCount;
 
-        // Render current selected partition mapping
         renderOrders();
 
       } catch (e) {
@@ -664,6 +870,7 @@
     fetchOrders();
     window.fetchOrders = fetchOrders;
     window.payNow = payNow;
+    window.payCOD = payCOD;
     window.logout = logout;
     window.switchTab = switchTab;
   </script>

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"ecommerce/config"
 	"ecommerce/models"
+	"ecommerce/services"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -31,7 +32,7 @@ func CreatePaymentOrder(c *gin.Context) {
 		return
 	}
 
-	if order.PaymentStatus == "paid" {
+	if order.PaymentStatus == "paid" || order.PaymentMethod == "cod" {
 		c.JSON(400, gin.H{
 			"error": "Order already paid",
 		})
@@ -161,6 +162,20 @@ func VerifyPayment(c *gin.Context) {
 		})
 		return
 	}
+
+	var user models.User //getting user details for sending email
+
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": "User not found",
+		})
+	}
+
+	go services.SendOrderConfirmationEmail(
+		user.Email,
+		order.ID,
+		order.TotalAmount,
+	)
 
 	c.JSON(200, gin.H{
 		"message": "Payment verified successfully",
@@ -337,4 +352,48 @@ func GetPaymentDetails(c *gin.Context) {
 		"razorpay_order_id":   order.RazorpayOrderID,
 		"razorpay_payment_id": order.RazorpayPaymentID,
 	})
+}
+
+func PlaceCODOrder(c *gin.Context) {
+
+	orderID := c.Param("order_id")
+	userID := c.MustGet("userID").(uint)
+
+	var order models.Order
+
+	if err := config.DB.
+		Where("id = ? AND user_id = ?", orderID, userID).
+		First(&order).Error; err != nil {
+
+		c.JSON(404, gin.H{
+			"error": "Order not found",
+		})
+		return
+	}
+
+	if order.PaymentStatus == "paid" {
+		c.JSON(400, gin.H{
+			"error": "Order already paid",
+		})
+		return
+	}
+
+	order.PaymentMethod = "COD"
+	order.PaymentStatus = "pending" // important for COD flow
+
+	if err := config.DB.Save(&order).Error; err != nil {
+		c.JSON(500, gin.H{
+			"error": "Failed to update order",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"order_id":       order.ID,
+		"amount":         order.TotalAmount,
+		"currency":       "INR",
+		"payment_method": "COD",
+		"payment_status": "pending",
+	})
+
 }

@@ -6,82 +6,168 @@
   <title>Marketplace - ShopSphere</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* --- Overriding Styles to Fix Card Awkwardness --- */
+    /* --- E-commerce Optimized Overrides (Amazon/Flipkart Inspired) --- */
+    
+    /* Lighten the background for an e-commerce feel */
+    body {
+      background-color: #f1f3f6; /* Classic Flipkart/Amazon light gray background */
+      color: #212121;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    .ambient-bg {
+      display: none; /* Disabling the dark ambient background */
+    }
+
+    /* Navbar light theme adjustments */
+    .navbar {
+      background-color: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      padding: 12px 24px;
+    }
+    
+    .nav-brand-name {
+      color: #2874f0; /* Flipkart Blue */
+      font-weight: bold;
+      font-size: 1.4rem;
+    }
+
+    .storefront-header h2 {
+      color: #212121;
+      margin-bottom: 4px;
+    }
+    
+    .brand-subtitle {
+      color: #878787;
+    }
+
     .marketplace-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
       padding: 20px 0;
     }
 
+    /* Crisp, white product card */
     .custom-product-card {
-      background: rgba(15, 23, 42, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px; /* Sharper corners like traditional marketplaces */
       overflow: hidden;
       display: flex;
       flex-direction: column;
       height: 100%;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+      position: relative;
     }
 
+    /* Subtle lift and distinct shadow on hover */
     .custom-product-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--primary, #6366f1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-color: transparent;
     }
 
     .custom-visual-pane {
-      height: 220px;
+      height: 200px;
       width: 100%;
       position: relative;
-      background: rgba(0, 0, 0, 0.25);
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 16px;
+      box-sizing: border-box;
     }
 
     .custom-product-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; /* Prevents cropping, crucial for product visibility */
       display: block;
+      transition: transform 0.3s ease;
+    }
+    
+    .custom-product-card:hover .custom-product-image {
+      transform: scale(1.05); /* Slight zoom on image hover */
     }
 
     .custom-fallback-box {
       width: 48px;
       height: 48px;
-      opacity: 0.2;
-      color: #fff;
+      opacity: 0.3;
+      color: #878787;
     }
 
     .custom-details-pane {
-      padding: 20px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
+      border-top: 1px solid #f0f0f0;
     }
 
+    /* Product Title */
     .custom-product-title {
-      margin: 0 0 8px 0;
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #ffffff;
-      white-space: nowrap;
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #212121;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit to 2 lines like Amazon */
+      -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    /* Fake Rating Block */
+    .custom-ratings {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+      font-size: 0.85rem;
+      color: #878787;
+    }
+    
+    .custom-stars {
+      color: #ff9f00; /* Marketplace yellow/gold */
+      font-size: 1rem;
+    }
+
+    /* Clean Marketplace Stock Tracker Elements */
+    .custom-stock-status {
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .stock-status-low {
+      color: #b71c1c; /* Crimson text indicating urgent running low inventory */
+    }
+    .stock-status-healthy {
+      color: #388e3c; /* Balanced marketplace green font */
     }
 
     .custom-pricing-row {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
     }
 
     .custom-price-val {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: 700;
-      color: var(--primary, #a78bfa);
+      color: #212121;
+    }
+    
+    /* Fake original price for the "deal" effect */
+    .custom-price-strike {
+      font-size: 0.9rem;
+      color: #878787;
+      text-decoration: line-through;
     }
 
     .custom-actions-wrapper {
@@ -89,53 +175,57 @@
       width: 100%;
     }
 
+    /* High conversion CTA button */
     .custom-submit-btn {
       width: 100%;
-      padding: 12px;
-      background: var(--primary, #6366f1);
+      padding: 10px;
+      background: #ff9f00; /* Flipkart Orange / Amazon Yellow-Orange vibe */
       border: none;
-      border-radius: 10px;
-      color: white;
+      border-radius: 4px;
+      color: #ffffff;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
     }
 
     .custom-submit-btn:hover:not(:disabled) {
-      background: #4f46e5;
+      background: #f39500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .custom-submit-btn:disabled {
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.3);
+      background: #e0e0e0;
+      color: #9e9e9e;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
+    /* Adjusted Badges */
     .custom-badge {
       position: absolute;
-      top: 12px;
-      left: 12px;
-      padding: 4px 10px;
-      border-radius: 30px;
+      top: 0;
+      left: 0;
+      padding: 4px 8px;
+      border-radius: 0 0 4px 0;
       font-size: 0.75rem;
-      font-weight: 700;
-      backdrop-filter: blur(4px);
+      font-weight: 600;
+      text-transform: uppercase;
+      z-index: 2;
     }
 
     .badge-success {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: #388e3c;
+      color: #ffffff;
     }
 
     .badge-danger {
-      background: rgba(244, 63, 94, 0.15);
-      color: #f43f5e;
-      border: 1px solid rgba(244, 63, 94, 0.3);
+      background: #d32f2f;
+      color: #ffffff;
     }
   </style>
 </head>
@@ -145,7 +235,7 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="brand-logo-group">
-        <div class="brand-logo small-logo">
+        <div class="brand-logo small-logo" style="color: #2874f0;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
           </svg>
@@ -154,36 +244,37 @@
       </div>
 
       <div class="nav-actions">
-        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='orders.html'">
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='orders.html'" style="color:#212121;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.793 1.993 1.821m-9.3 15.39c-1.118-.094-1.964-1.057-1.964-2.192V6.108c0-1.135.846-2.098 1.964-2.192m11.123 18V21a3 3 0 0 0-3-3H9.75a3 3 0 0 0-3 3v.75m11.25 0v-4.66a2.25 2.25 0 0 0-.659-1.591L15 14.25M9.75 21v-4.66a2.25 2.25 0 0 1 .659-1.591L12 14.25" /></svg>
           <span>My Orders</span>
         </button>
         
-        <button type="button" class="nav-btn primary-btn" onclick="window.location.href='cart.html'">
+        <button type="button" class="nav-btn primary-btn" onclick="window.location.href='cart.html'" style="background:#2874f0; color:#fff; border:none; padding:8px 16px; border-radius:4px;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
-          <span>Go to Cart</span>
+          <span>Cart</span>
         </button>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <main class="storefront-container">
-      <div class="storefront-header">
-        <div>
-          <h2>Trending Catalog</h2>
-          <p class="brand-subtitle">Explore top-tier verified items active on the network.</p>
-        </div>
-        <div class="logout-wrapper">
-          <a href="login.html" onclick="logout(event)" class="logout-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
-            <span>Logout</span>
-          </a>
-        </div>
+  <main class="storefront-container" style="max-width: 1200px; margin: 0 auto; padding: 24px;">
+    <div class="storefront-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div>
+        <h2 style="margin:0; font-size:1.5rem;">Trending Catalog</h2>
+        <p class="brand-subtitle" style="margin:4px 0 0 0; font-size:0.9rem;">Explore top-tier verified items active on the network.</p>
       </div>
+      <div class="logout-wrapper">
+        <a href="login.html" onclick="logout(event)" class="logout-link" style="display:flex; align-items:center; gap:4px; color:#d32f2f; text-decoration:none; font-weight:500;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
 
-      <p id="result" class="result" aria-live="polite"></p>
+    <p id="result" class="result" aria-live="polite"></p>
 
-      <div id="productsList" class="marketplace-grid" aria-live="polite"></div>
-    </main>
+    <div id="productsList" class="marketplace-grid" aria-live="polite"></div>
+  </main>
 
   <script src="app.js"></script>
   <script>
@@ -208,8 +299,8 @@
       if (isLoading) {
         list.innerHTML = `
           <div class="loading-skeleton-wrapper" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-            <div class="spinner" style="margin: 0 auto 12px;"></div>
-            <p class="muted">Querying active catalog items...</p>
+            <div class="spinner" style="margin: 0 auto 12px; border-top-color: #2874f0;"></div>
+            <p style="color: #878787;">Querying active catalog items...</p>
           </div>
         `;
       }
@@ -252,21 +343,31 @@
 
         if (normalized.length === 0) {
           setResult('Products fetched, but list is empty.', 'error');
-          document.getElementById('productsList').innerHTML = '<p class="muted" style="grid-column: 1 / -1; text-align: center;">No products available currently.</p>';
+          document.getElementById('productsList').innerHTML = '<p style="color: #878787; grid-column: 1 / -1; text-align: center;">No products available currently.</p>';
           return;
         }
 
         const html = normalized.map(p => {
           const id = p.id;
           const name = p.name;
-          const price = p.price;
-          const stock = p.stock;
-          const isOutOfStock = stock !== undefined && Number(stock) <= 0;
+          const price = Number(p.price ?? 0);
+          const fakeOriginalPrice = (price * 1.2).toFixed(2); // 20% markup for "deal" effect
+          const stock = p.stock !== undefined ? Number(p.stock) : 0;
+          const isOutOfStock = stock <= 0;
 
-          // Uses custom encapsulated class namespaces to completely prevent old layout rules leaking in
+          // Compute dynamic stock tracker markup string
+          let stockStatusMarkup = '';
+          if (isOutOfStock) {
+            stockStatusMarkup = `<div class="custom-stock-status stock-status-low">Temporarily Out of Stock</div>`;
+          } else if (stock <= 5) {
+            stockStatusMarkup = `<div class="custom-stock-status stock-status-low">Hurry, only ${stock} left in stock!</div>`;
+          } else {
+            stockStatusMarkup = `<div class="custom-stock-status stock-status-healthy">In Stock (${stock} available)</div>`;
+          }
+
           return `
             <div class="custom-product-card">
-              <div class="custom-visual-pane" role="button" tabindex="0" onclick="openProductDetails(${id})" onkeydown="if(event.key==='Enter'){openProductDetails(${id})}">
+              <div class="custom-visual-pane" role="button" tabindex="0" onclick="openProductDetails(${id})" onkeydown="if(event.key==='Enter'){openProductDetails(${id})}" style="cursor:pointer;">
                 ${p.imageUrl ? 
                   `<img class="custom-product-image" src="${p.imageUrl}" alt="${name ?? 'Product image'}" loading="lazy" onerror="this.parentElement.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke-width=\'1.2\' stroke=\'currentColor\' class=\'custom-fallback-box\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l12 5.25m0 0v-9\' /></svg>'" />` :
                   `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="custom-fallback-box">
@@ -274,17 +375,27 @@
                   </svg>`
                 }
                 <span class="custom-badge ${isOutOfStock ? 'badge-danger' : 'badge-success'}">
-                  ${isOutOfStock ? 'Sold Out' : `${stock} units left`}
+                  ${isOutOfStock ? 'Sold Out' : 'Bestseller'}
                 </span>
               </div>
-              <div class="custom-details-pane" role="button" tabindex="0" onclick="openProductDetails(${id})" onkeydown="if(event.key==='Enter'){openProductDetails(${id})}">
+              <div class="custom-details-pane" role="button" tabindex="0" onclick="openProductDetails(${id})" onkeydown="if(event.key==='Enter'){openProductDetails(${id})}" style="cursor:pointer;">
                 <h3 class="custom-product-title" title="${name}">${name ?? 'Premium Merchandise'}</h3>
-                <div class="custom-pricing-row">
-                  <span class="custom-price-val">$${Number(price ?? 0).toFixed(2)}</span>
+                
+                <div class="custom-ratings">
+                  <span class="custom-stars">★★★★☆</span>
+                  <span>(1,284)</span>
                 </div>
+
+                ${stockStatusMarkup}
+
+                <div class="custom-pricing-row">
+                  <span class="custom-price-val">$${price.toFixed(2)}</span>
+                  <span class="custom-price-strike">$${fakeOriginalPrice}</span>
+                </div>
+
                 <div class="custom-actions-wrapper">
                   <button type="button" class="custom-submit-btn" onclick="event.stopPropagation(); addToCart(${id})" ${isOutOfStock ? 'disabled' : ''}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
                     <span>${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
                   </button>
                 </div>
