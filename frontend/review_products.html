@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave a Review - ShopSphere</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --surface: rgba(30, 41, 59, 0.7);
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --danger: #f43f5e;
+      --warning: #fbbf24;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .storefront-container {
+      max-width: 980px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .navbar { padding: 1rem 1.5rem; border-bottom: 1px solid var(--card-border); background: var(--surface); }
+    .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
+    .brand-logo-group { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 1.2rem; }
+    .nav-actions { display: flex; gap: 12px; }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.05); }
+
+    .storefront-header {
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+    }
+    .storefront-header h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .result { font-size: 0.95rem; margin: 0 0 1rem 0; }
+    .result.success { color: var(--success); }
+    .result.error { color: var(--danger); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .review-item {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .review-item:last-child { border-bottom: none; }
+
+    .review-item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .product-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .muted { color: var(--muted); }
+
+    .field-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    textarea, select, input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.2);
+      color: var(--text-main);
+      outline: none;
+      box-sizing: border-box;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background-color 0.2s ease;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .star-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .star-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.2);
+      color: var(--muted);
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .star-btn.active {
+      background: rgba(59,130,246,0.25);
+      border-color: rgba(59,130,246,0.6);
+      color: #dbeafe;
+      box-shadow: 0 8px 18px rgba(59,130,246,0.18);
+    }
+
+    .row-actions { display: flex; justify-content: flex-end; }
+  </style>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo-group">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="var(--primary)">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+        </svg>
+        <span class="nav-brand-name">ShopSphere</span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="nav-btn" onclick="window.location.href='orders.html'">← Back to Orders</button>
+        <button type="button" class="nav-btn" onclick="logout(event)" style="color: var(--danger); border-color: rgba(244, 63, 94, 0.3);">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="storefront-container">
+    <div class="storefront-header">
+      <h2>Leave a product review</h2>
+      <div class="muted" style="margin-top:6px; font-size:0.95rem;">Rate your delivered products and share a short comment.</div>
+    </div>
+
+    <p id="result" class="result" aria-live="polite"></p>
+
+    <div class="card" id="reviewCard">
+      <div id="reviewList"></div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = 'http://localhost:8080';
+
+    function getToken() { return localStorage.getItem('token'); }
+    function authHeaders() {
+      const token = getToken();
+      return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    }
+
+    function setResult(message, type) {
+      const el = document.getElementById('result');
+      if (!el) return;
+      el.className = `result ${type || ''}`;
+      el.innerText = message || '';
+      el.style.marginBottom = '1rem';
+    }
+
+    function clearAuthAndRedirectToLogin() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;').replaceAll('<', '<').replaceAll('>', '>')
+        .replaceAll('"', '"').replaceAll("'", '&#039;');
+    }
+
+    function getQueryParams() {
+      const sp = new URLSearchParams(window.location.search);
+      const obj = {};
+      for (const [k, v] of sp.entries()) obj[k] = v;
+      return obj;
+    }
+
+    function renderReviewItem({ productId, productName, orderId }) {
+      const pid = String(productId);
+      const oid = String(orderId ?? '');
+
+      return `
+        <div class="review-item" data-product-id="${escapeHtml(pid)}" data-order-id="${escapeHtml(oid)}">
+          <div class="review-item-header">
+            <div>
+              <p class="product-title">${escapeHtml(productName || 'Product')}</p>
+              <div class="muted" style="font-size:0.9rem; margin-top:4px;">Order: #${escapeHtml(oid)}</div>
+            </div>
+          </div>
+
+          <div>
+            <span class="field-label">Rating</span>
+            <div class="star-row" role="radiogroup" aria-label="Rating">
+              ${[1,2,3,4,5].map(n => `
+                <button type="button" class="star-btn" data-rating="${n}" onclick="setRating(this, ${n})">${n}</button>
+              `).join('')}
+              <input type="hidden" name="rating" class="rating-input" value="" />
+            </div>
+          </div>
+
+          <div>
+            <span class="field-label">Comment</span>
+            <textarea class="comment-input" placeholder="What did you like? What could be better?"></textarea>
+          </div>
+
+          <div class="row-actions">
+            <button class="btn" onclick="submitReview(event, ${JSON.stringify({ productId: pid, orderId: oid })})">Submit Review</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function setRating(btn, n) {
+      const wrapper = btn.closest('.review-item');
+      if (!wrapper) return;
+      wrapper.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const ratingInput = wrapper.querySelector('.rating-input');
+      if (ratingInput) ratingInput.value = String(n);
+    }
+
+    async function submitReview(event, ctx) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const productId = ctx.productId;
+      const orderId = ctx.orderId;
+
+      const itemEl = document.querySelector(`.review-item[data-product-id="${CSS.escape(String(productId))}"][data-order-id="${CSS.escape(String(orderId))}"]`);
+      if (!itemEl) {
+        setResult('Review UI context not found.', 'error');
+        return;
+      }
+
+      const rating = itemEl.querySelector('.rating-input')?.value;
+      const comment = (itemEl.querySelector('.comment-input')?.value || '').trim();
+
+      if (!rating) {
+        setResult('Please select a rating (1-5).', 'error');
+        return;
+      }
+
+      const submitBtn = event.currentTarget;
+      if (submitBtn) submitBtn.disabled = true;
+      setResult('', null);
+
+      try {
+        const res = await fetch(`${API_BASE}/reviews`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            productId: Number(productId),
+            orderId: Number(orderId),
+            rating: Number(rating),
+            comment: comment,
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 401) {
+          clearAuthAndRedirectToLogin();
+          return;
+        }
+
+        if (!res.ok) {
+          setResult(data.message || data.error || 'Failed to submit review.', 'error');
+          return;
+        }
+
+        setResult('Review submitted successfully. Thank you!', 'success');
+      } catch (e) {
+        console.error(e);
+        setResult('Network error while submitting review.', 'error');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    }
+
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    function loadFromQueryOrFallback() {
+      const q = getQueryParams();
+
+      // Supported modes:
+      // 1) review_products.html?orderId=123&productId=9&productName=Phone
+      // 2) If not provided, show a helpful message since backend "eligible reviews" endpoint isn't implemented.
+
+      const orderId = q.orderId;
+      const productId = q.productId;
+      const productName = q.productName;
+
+      const list = document.getElementById('reviewList');
+      if (!list) return;
+
+      if (orderId && productId) {
+        list.innerHTML = renderReviewItem({ productId, productName, orderId });
+        return;
+      }
+
+      list.innerHTML = `
+        <div class="muted" style="padding: 16px 0; font-size:0.95rem; line-height:1.5;">
+          No specific product context found. Open this page from <b>Orders</b> using the “Leave review” button.
+        </div>
+      `;
+    }
+
+    loadFromQueryOrFallback();
+    window.submitReview = submitReview;
+    window.setRating = setRating;
+    window.logout = logout;
+  </script>
+</body>
+</html>
+

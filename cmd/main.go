@@ -14,6 +14,7 @@ func main() {
 
 	err := config.DB.AutoMigrate(
 		&models.User{},
+		&models.Category{},
 		&models.Product{},
 		&models.Order{},
 		&models.OrderItem{},
@@ -21,6 +22,7 @@ func main() {
 		&models.CartItem{},
 		&models.Review{},
 		&models.ReviewImage{},
+		&models.OrderStatusHistory{},
 	)
 	if err != nil {
 		panic(err)

@@ -161,6 +161,20 @@
         </div>
       </div>
 
+      <div style="margin-bottom: 18px; padding: 14px 16px; border: 1px solid var(--card-border); border-radius: 14px; background: rgba(0,0,0,0.18);">
+        <div style="font-weight: 800; margin-bottom: 10px;">Choose Payment Method</div>
+        <div style="display:flex; gap: 14px; flex-wrap: wrap;">
+          <label style="display:flex; align-items:center; gap: 10px; cursor:pointer;">
+            <input type="radio" name="payment_method" value="cod" id="pmCOD" checked />
+            <span style="font-weight: 700;">Pay via COD</span>
+          </label>
+          <label style="display:flex; align-items:center; gap: 10px; cursor:pointer;">
+            <input type="radio" name="payment_method" value="razorpay" id="pmRazorpay" />
+            <span style="font-weight: 700;">Pay via Razorpay (Online)</span>
+          </label>
+        </div>
+      </div>
+
       <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid var(--card-border); padding-top: 20px;">
         <button type="button" class="nav-btn secondary-btn" id="modifyItemsBtn" onclick="closeCheckout()" style="width: auto !important; padding: 10px 20px;">
           ← Modify Items
@@ -435,7 +449,47 @@
           return;
         }
 
-        // 2) Create Razorpay order on backend
+        // Decide payment method
+        const selectedPayment = document.querySelector('input[name="payment_method"]:checked')?.value || 'cod';
+
+        if (selectedPayment === 'cod') {
+          // COD flow
+          setResult('Placing order with COD...', 'success');
+
+          const codRes = await fetch(`${API_BASE}/payment/COD/${orderId}`, {
+            method: 'POST',
+            headers: authHeaders(),
+          });
+
+          const codData = await codRes.json().catch(() => ({}));
+
+          if (codRes.status === 401) {
+            clearAuthAndRedirectToLogin();
+            if (confirmBtn) confirmBtn.disabled = false;
+            return;
+          }
+
+          if (!codRes.ok) {
+            setResult(codData.error || codData.message || 'Failed to place COD order.', 'error');
+            if (confirmBtn) confirmBtn.disabled = false;
+            return;
+          }
+
+          setResult('Order placed successfully! Pay with COD on delivery.', 'success');
+
+          // Clear UI cart
+          globalCartItems = [];
+          setSummary(0, 0);
+          document.getElementById('checkoutItemsPreview').innerHTML = '';
+          document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
+          document.getElementById('modifyItemsBtn').style.display = 'none';
+          document.getElementById('summaryHint').innerText = 'COD order placed.';
+
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
+
+        // Razorpay flow
         setResult('Opening Razorpay...', 'success');
 
         const createRes = await fetch(`${API_BASE}/payments/create-order/${orderId}`, {
@@ -457,7 +511,7 @@
           return;
         }
 
-        // 3) Open Razorpay Checkout
+        // Open Razorpay Checkout
         if (!window.Razorpay) {
           setResult('Razorpay script not loaded.', 'error');
           if (confirmBtn) confirmBtn.disabled = false;

@@ -1,23 +1,34 @@
 package controllers
 
-import ("ecommerce/models"
+import (
 	"ecommerce/config"
+	"ecommerce/models"
 
-	"github.com/gin-gonic/gin")
+	"github.com/gin-gonic/gin"
+)
 
-func updateProfile(c *gin.Context){
+type UpdateProfileRequest struct {
+	Name    string `json:"name"`
+	Phone   string `json:"phone"`
+	Address string `json:"address"`
+	City    string `json:"city"`
+	State   string `json:"state"`
+	Pincode string `json:"pincode"`
+}
 
-	userID:=c.MustGet("userID")
+func GetProfile(c *gin.Context) {
 
-	var user map[string]interface{}
+	userID := c.MustGet("userID").(uint)
 
-	if err:=c.ShouldBindJSON(&user).Error;err!=nil{
-		c.JSON(400,gin.H{
-			"message":"Invalid Data",
+	var user models.User
+
+	if err := config.DB.First(&user, userID).Error; err != nil {
+
+		c.JSON(404, gin.H{
+			"message": "User not found",
 		})
+		return
 	}
 
-	if err:= config.DB.Find(&user,userID)
-
-
+	c.JSON(200, gin.H{})
 }

@@ -8,11 +8,11 @@ type Order struct {
 	UserID            uint
 	TotalAmount       float64
 	Status            string
-	PaymentStatus     string // pending, paid, failed
+	PaymentStatus     string // pending, cod, paid, failed
 	RazorpayOrderID   string // important
 	RazorpayPaymentID string
-
-	OrderItems []OrderItem
+	PaymentMethod     string // cod, razorpay
+	OrderItems        []OrderItem
 
 	User User
 }

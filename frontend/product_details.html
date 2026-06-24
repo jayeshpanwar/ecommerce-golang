@@ -278,8 +278,11 @@
         if (!res.ok) throw new Error('Failed to fetch product data');
         
         const data = await res.json();
-        const products = data.data || data || [];
-        
+
+        // /products (GetProducts) returns: { page, limit, totalProducts, totalPages, products: [...] }
+        const productsCandidate = data?.products ?? data?.data ?? data ?? [];
+        const products = Array.isArray(productsCandidate) ? productsCandidate : [];
+
         // Find the specific product matching the URL ID
         const product = products.find(p => String(p.id ?? p.ID) === String(productId));
 

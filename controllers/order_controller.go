@@ -3,7 +3,10 @@ package controllers
 import (
 	"ecommerce/config"
 	"ecommerce/models"
+	"ecommerce/services"
+	"ecommerce/utils"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -134,6 +137,12 @@ func CreateOrder(c *gin.Context) {
 			return err
 		}
 
+		services.AddOrderHistory(
+			order.ID,
+			utils.OrderPending,
+			userID,
+		)
+
 		for _, item := range cartItems {
 			var product models.Product
 			if err := tx.First(&product, item.ProductID).Error; err != nil {
@@ -156,10 +165,6 @@ func CreateOrder(c *gin.Context) {
 				return err
 			}
 
-			if err := tx.Save(&product).Error; err != nil {
-				c.JSON(500, gin.H{"error": err.Error()})
-				return err
-			}
 		}
 
 		// Remove cart completely (items + cart row)
@@ -172,6 +177,7 @@ func CreateOrder(c *gin.Context) {
 			return err
 		}
 
+		// IMPORTANT: Frontend needs order_id to continue Razorpay payment flow
 		c.JSON(201, gin.H{
 			"message":        "Order placed successfully",
 			"order_id":       order.ID,
@@ -179,6 +185,7 @@ func CreateOrder(c *gin.Context) {
 			"payment_status": order.PaymentStatus,
 			"status":         order.Status,
 		})
+
 		return nil
 	})
 
@@ -186,7 +193,10 @@ func CreateOrder(c *gin.Context) {
 		// Errors are already sent inside the transaction in most cases.
 		return
 	}
-} //-----------------------------View Orders-----------------------------------------
+
+}
+
+//-----------------------------View Orders-----------------------------------------
 
 func ViewOrders(c *gin.Context) {
 
@@ -352,6 +362,12 @@ func AcceptOrder(c *gin.Context) {
 		return
 	}
 
+	services.AddOrderHistory(
+		item.OrderID,
+		utils.OrderAccepted,
+		sellerID,
+	)
+
 	c.JSON(200, gin.H{
 		"message": "Order accepted",
 	})
@@ -384,6 +400,12 @@ func RejectOrder(c *gin.Context) {
 	item.Status = "rejected"
 
 	config.DB.Save(&item)
+
+	services.AddOrderHistory(
+		item.OrderID,
+		utils.OrderRejected,
+		sellerID,
+	)
 
 	c.JSON(200, gin.H{
 		"message": "Order rejected",
@@ -427,6 +449,12 @@ func ShipOrder(c *gin.Context) {
 		return
 	}
 
+	services.AddOrderHistory(
+		item.OrderID,
+		utils.OrderShipped,
+		sellerID,
+	)
+
 	c.JSON(200, gin.H{
 		"message": "Order shipped",
 	})
@@ -463,7 +491,39 @@ func DeliverOrder(c *gin.Context) {
 
 	config.DB.Save(&item)
 
+	services.AddOrderHistory(
+		item.OrderID,
+		utils.OrderDelivered,
+		sellerID,
+	)
+
 	c.JSON(200, gin.H{
 		"message": "Order delivered",
+	})
+}
+
+//----------------------------------------------------------------
+
+func GetOrderTracking(c *gin.Context) {
+
+	id, _ := strconv.ParseUint(
+		c.Param("id"),
+		10,
+		64,
+	)
+
+	history, err :=
+		services.GetOrderHistory(uint(id))
+
+	if err != nil {
+
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"history": history,
 	})
 }

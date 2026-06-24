@@ -14,7 +14,6 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/login", controllers.Login)
 	router.GET("/products", controllers.GetProducts)
 	router.POST("/webhooks/razorpay", controllers.RazorpayWebhook)
-
 	router.GET("/shop/products", controllers.GetApprovedProducts)
 
 	// Seller Routes
@@ -45,6 +44,7 @@ func SetupRoutes(router *gin.Engine) {
 		admin.GET("/products/pending", controllers.GetPendingSellerProducts)
 		admin.PUT("/products/:id/approve", controllers.ApproveProduct)
 		admin.PUT("/products/:id/reject", controllers.RejectProduct)
+		admin.POST("/categories", controllers.CreateCategory)
 
 	}
 
@@ -68,6 +68,8 @@ func SetupRoutes(router *gin.Engine) {
 		user.POST("/payments/create-order/:order_id", controllers.CreatePaymentOrder)
 		user.POST("/payments/verify", controllers.VerifyPayment)
 		user.GET("/orders/:id/payments", controllers.GetPaymentDetails)
+		user.GET("/orders/:id/tracking", controllers.GetOrderTracking)
+		user.POST("/payment/COD/:order_id", controllers.PlaceCODOrder)
 
 		//user.POST("/reviews", controllers.CreateReview)
 

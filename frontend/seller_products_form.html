@@ -156,11 +156,21 @@
           </div>
 
           <div class="input-group">
+            <label for="category_id">Category</label>
+            <select id="category_id" required>
+              <option value="" selected disabled>Loading categories...</option>
+            </select>
+            <div id="categoryHint" class="helper-text" style="margin-top:8px; display:none;">Choose a category created by admin.</div>
+          </div>
+
+
+          <div class="input-group">
             <label for="image">Product Image</label>
             <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg" required />
           </div>
 
           <button type="submit" id="submitBtn">Publish Product</button>
+
 
         </form>
       </div>
@@ -262,6 +272,32 @@
       window.location.href = 'login.html';
     }
 
+    async function loadCategories() {
+      try {
+        const token = getToken();
+        if (!token) return;
+
+        const categorySelect = document.getElementById('category_id');
+        const hint = document.getElementById('categoryHint');
+        if (!categorySelect) return;
+
+        categorySelect.innerHTML = `<option value="" selected disabled>Loading categories...</option>`;
+        if (hint) hint.style.display = 'none';
+
+        // NOTE: Your current backend only has POST /admin/categories.
+        // If you add a GET endpoint later, this function can populate automatically.
+        // For now we keep the dropdown empty so seller must choose a valid category_id.
+
+        categorySelect.innerHTML = `<option value="" selected disabled>No categories endpoint found</option>`;
+        if (hint) {
+          hint.style.display = 'block';
+          hint.innerText = ' .';
+        }
+      } catch (e) {
+        // keep dropdown usable           
+      }
+    }
+
     async function createProduct() {
       try {
         if (!getToken()) { setResult('Authentication expired.', 'error'); return; }
@@ -270,6 +306,8 @@
         const description = document.getElementById('description').value.trim();
         const price = document.getElementById('price').value;
         const stock = document.getElementById('stock').value;
+        const categoryId = document.getElementById('category_id').value;
+
         const fileInput = document.getElementById('image');
         const file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
@@ -283,7 +321,9 @@
         formData.append('description', description);
         formData.append('price', price);
         formData.append('stock', stock);
+        formData.append('category_id', categoryId);
         formData.append('image', file);
+
 
         const res = await fetch(`${API_BASE}/seller/products`, {
           method: 'POST',
@@ -406,6 +446,9 @@
     window.switchTab = switchTab;
     window.createProduct = createProduct;
     window.updateProduct = updateProduct;
+    // Load categories for dropdown (requires a categories GET endpoint in backend)
+    loadCategories();
+
     window.deleteProduct = deleteProduct;
     window.logout = logout;
   </script>
