@@ -273,22 +273,27 @@
           return;
         }
 
-        // 2. Fetch data (Robust approach: fetch all and filter if a specific /id route isn't available)
-        const res = await fetch(`${API_BASE}/products`, { method: 'GET', headers: authHeaders() });
-        if (!res.ok) throw new Error('Failed to fetch product data');
-        
+        // 2. Fetch the product by id (single-product endpoint)
+        // Route: GET /products/:id (filters status=approved)
+        const res = await fetch(`${API_BASE}/products/${encodeURIComponent(productId)}`, {
+          method: 'GET',
+          headers: authHeaders(),
+        });
+
+        if (!res.ok) {
+          // Backend returns: {"message":"Product not found"} on 404
+          const errData = await res.json().catch(() => ({}));
+          const msg = errData?.message || errData?.error || 'Product is no longer available in the catalog.';
+          throw new Error(msg);
+        }
+
         const data = await res.json();
+        const product = data?.data ?? data?.product ?? data;
 
-        // /products (GetProducts) returns: { page, limit, totalProducts, totalPages, products: [...] }
-        const productsCandidate = data?.products ?? data?.data ?? data ?? [];
-        const products = Array.isArray(productsCandidate) ? productsCandidate : [];
-
-        // Find the specific product matching the URL ID
-        const product = products.find(p => String(p.id ?? p.ID) === String(productId));
-
-        if (!product) {
+        if (!product || !(product.id ?? product.ID)) {
           throw new Error('Product is no longer available in the catalog.');
         }
+
 
         // 3. Normalize Data
         const pId = product.id ?? product.ID;
