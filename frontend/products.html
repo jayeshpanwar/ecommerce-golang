@@ -274,7 +274,14 @@
     <p id="result" class="result" aria-live="polite"></p>
 
     <div id="productsList" class="marketplace-grid" aria-live="polite"></div>
+
+    <div id="paginationWrap" style="display:flex; justify-content:center; margin-top:18px; gap:8px; flex-wrap:wrap;">
+      <button id="prevPageBtn" type="button" class="nav-btn secondary-btn" style="padding:10px 14px; border-radius:6px;" onclick="changePage(-1)">← Prev</button>
+      <div id="paginationInfo" style="align-self:center; color:#878787; font-size:0.95rem; padding:10px 8px;"></div>
+      <button id="nextPageBtn" type="button" class="nav-btn secondary-btn" style="padding:10px 14px; border-radius:6px;" onclick="changePage(1)">Next →</button>
+    </div>
   </main>
+
 
   <script src="app.js"></script>
   <script>
@@ -311,6 +318,29 @@
       window.location.href = 'login.html';
     }
 
+    let currentPage = 1;
+    let totalPages = 1;
+    const pageSize = 10;
+
+    function updatePaginationUI() {
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+      const info = document.getElementById('paginationInfo');
+
+      if (prevBtn) prevBtn.disabled = currentPage <= 1;
+      if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+      if (info) info.innerText = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    function changePage(delta) {
+      const newPage = currentPage + delta;
+      if (newPage < 1) return;
+      if (newPage > totalPages) return;
+      currentPage = newPage;
+      fetchProducts();
+    }
+
     async function fetchProducts() {
       try {
         setResult('', null);
@@ -323,7 +353,10 @@
 
         setLoading(true);
 
-        const res = await fetch(`${API_BASE}/products`, { method: 'GET', headers: authHeaders() });
+        const res = await fetch(
+          `${API_BASE}/products?page=${encodeURIComponent(currentPage)}&limit=${encodeURIComponent(pageSize)}`,
+          { method: 'GET', headers: authHeaders() },
+        );
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
@@ -332,7 +365,12 @@
           return;
         }
 
-        const products = data.data || data || [];
+        const products = data.products || data.data || data || [];
+        totalPages = Number(data.totalPages ?? totalPages ?? 1);
+        if (!Number.isFinite(totalPages) || totalPages < 1) totalPages = 1;
+
+        updatePaginationUI();
+
         const normalized = (Array.isArray(products) ? products : []).map(p => ({
           id: p.id ?? p.ID,
           name: p.name ?? p.Name,
@@ -344,6 +382,7 @@
         if (normalized.length === 0) {
           setResult('Products fetched, but list is empty.', 'error');
           document.getElementById('productsList').innerHTML = '<p style="color: #878787; grid-column: 1 / -1; text-align: center;">No products available currently.</p>';
+          updatePaginationUI();
           return;
         }
 
@@ -354,6 +393,7 @@
           const fakeOriginalPrice = (price * 1.2).toFixed(2); // 20% markup for "deal" effect
           const stock = p.stock !== undefined ? Number(p.stock) : 0;
           const isOutOfStock = stock <= 0;
+
 
           // Compute dynamic stock tracker markup string
           let stockStatusMarkup = '';
@@ -457,6 +497,8 @@
     window.addToCart = addToCart;
     window.openProductDetails = openProductDetails;
     window.logout = logout;
+    window.changePage = changePage;
   </script>
 </body>
 </html>
+

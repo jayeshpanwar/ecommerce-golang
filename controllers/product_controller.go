@@ -6,6 +6,7 @@ import (
 	"ecommerce/services"
 	"ecommerce/utils"
 	"fmt"
+	"math"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -135,7 +136,17 @@ func CreateProduct(c *gin.Context) {
 
 func GetProducts(c *gin.Context) {
 
-	products, err := services.GetApprovedProducts()
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil {
+		limit = 10
+	}
+
+	response, total, err := services.GetApprovedProducts(page, limit)
 
 	if err != nil {
 
@@ -145,9 +156,16 @@ func GetProducts(c *gin.Context) {
 		return
 	}
 
+	totalPages := int(math.Ceil(
+		float64(total) / float64(limit),
+	))
+
 	c.JSON(200, gin.H{
-		"message": "Products fetched successfully",
-		"data":    products,
+		"page":          page,
+		"limit":         limit,
+		"totalProducts": total,
+		"totalPages":    totalPages,
+		"products":      response,
 	})
 }
 

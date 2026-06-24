@@ -9,15 +9,24 @@ func CreateProduct(product *models.Product) error {
 	return config.DB.Create(product).Error
 }
 
-func GetApprovedProducts() ([]models.Product, error) {
+func GetApprovedProducts(limit int, offset int) ([]models.Product, int64, error) {
+
+	var total int64
+
+	config.DB.
+		Model(&models.Product{}).
+		Where("status = ?", "approved").
+		Count(&total)
 
 	var products []models.Product
 
 	err := config.DB.
 		Where("status = ?", "approved").
+		Limit(limit).
+		Offset(offset).
 		Find(&products).Error
 
-	return products, err
+	return products, total, err
 }
 
 // --------------------------------------------------------------------------------------

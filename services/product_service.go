@@ -27,12 +27,26 @@ func CreateProduct(product *models.Product) error {
 
 //--------------------------------------------------------------------------------------------
 
-func GetApprovedProducts() ([]utils.ProductResponse, error) {
+func GetApprovedProducts(page int, limit int) ([]utils.ProductResponse, int64, error) {
 
-	products, err := repositories.GetApprovedProducts()
+	if page < 1 {
+		page = 1
+	}
+
+	if limit < 1 {
+		limit = 10
+	}
+
+	if limit > 100 {
+		limit = 100
+	}
+
+	offset := (page - 1) * limit
+
+	products, total, err := repositories.GetApprovedProducts(limit, offset)
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var response []utils.ProductResponse
@@ -45,7 +59,7 @@ func GetApprovedProducts() ([]utils.ProductResponse, error) {
 		)
 	}
 
-	return response, nil
+	return response, total, nil
 }
 
 // --------------------------------------------------------------------------------------------
