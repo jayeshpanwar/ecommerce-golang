@@ -218,7 +218,7 @@
       border-radius: 4px;
       border: none;
       background: var(--warning);
-      color: #fff;
+      color: #ffffff;
       cursor: pointer;
       font-weight: 600;
       font-size: 0.85rem;
@@ -226,7 +226,7 @@
       transition: background-color 0.15s ease;
     }
 
-    .pay-btn:hover { background: #e68a00; }
+    .pay-btn:hover { background: #332ddc; }
 
     .nav-btn {
       padding: 8px 16px;
@@ -701,7 +701,7 @@
               </div>
               <div><span class="status-badge ${itemStatusClass(st)}">${escapeHtml(st)}</span></div>
               <div class="muted">$${escapeHtml(price.toFixed(2))}</div>
-              <div style="font-weight: 600;">$${escapeHtml(subtotal)}</div>
+              <div style="font-weight: 600;">₹${escapeHtml(subtotal)}</div>
             </div>
             
             ${timelineContainerHTML}
@@ -804,7 +804,7 @@
             <td>${formatDate(orderedAt)}</td>
             <td><span class="status-badge status-default">${escapeHtml(orderStatus || '')}</span></td>
             <td><span class="status-badge ${paymentBadgeClass(paymentStatus)}">${escapeHtml(paymentStatus)}</span></td>
-            <td><span class="order-total-txt">$${escapeHtml(total)}</span></td>
+            <td><span class="order-total-txt">₹${escapeHtml(total)}</span></td>
             <td>${actionHTML}</td>
           </tr>
           

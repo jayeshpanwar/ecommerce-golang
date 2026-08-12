@@ -30,3 +30,18 @@ func CreateCategory(c *gin.Context) {
 		"data":    category,
 	})
 }
+
+func GetCategories(c *gin.Context) {
+
+	categories, err := services.GetCategories()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "failed to fetch categories",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"data": categories,
+	})
+}

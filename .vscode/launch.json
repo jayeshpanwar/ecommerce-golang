@@ -78,6 +78,14 @@
             "mode": "auto",
             "args": [],
             "program": "/home/developer/ecommerce/cmd/main.go"
+        },
+        {
+            "type": "go",
+            "name": "debug review_repository.go",
+            "request": "launch",
+            "mode": "auto",
+            "args": [],
+            "program": "/home/developer/ecommerce/repositories/review_repository.go"
         }
     ]
 }

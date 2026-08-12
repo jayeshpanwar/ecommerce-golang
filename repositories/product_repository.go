@@ -9,6 +9,8 @@ func CreateProduct(product *models.Product) error {
 	return config.DB.Create(product).Error
 }
 
+//--------------------------------------------------------------------------------------
+
 func GetApprovedProducts(limit int, offset int) ([]models.Product, int64, error) {
 
 	var total int64
@@ -22,6 +24,7 @@ func GetApprovedProducts(limit int, offset int) ([]models.Product, int64, error)
 
 	err := config.DB.
 		Where("status = ?", "approved").
+		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&products).Error
@@ -112,3 +115,65 @@ func GetPendingProducts() ([]models.Product, error) {
 }
 
 //----------------------------------------------------------------------------------------------
+
+func GetProductsByCategoryID(categoryID uint, limit int, offset int) ([]models.Product, int64, error) {
+
+	var products []models.Product
+	var total int64
+
+	config.DB.Model(&models.Product{}).
+		Where(
+			"category_id = ? AND status = ?",
+			categoryID,
+			"approved",
+		).
+		Count(&total)
+
+	err := config.DB.
+		Where(
+			"category_id = ? AND status = ?",
+			categoryID,
+			"approved",
+		).
+		Limit(limit).
+		Offset(offset).
+		Find(&products).Error
+
+	return products, total, err
+}
+
+func SearchProducts(
+	query string,
+	limit int,
+	offset int,
+) ([]models.Product, int64, error) {
+
+	var products []models.Product
+	var total int64
+
+	searchPattern := "%" + query + "%"
+
+	config.DB.
+		Model(&models.Product{}).
+		Where(
+			`status = ? AND ( name LIKE ? OR description LIKE ?)`,
+			"approved",
+			searchPattern,
+			searchPattern,
+		).
+		Count(&total)
+
+	err := config.DB.
+		Where(
+			`status = ? AND ( name LIKE ? OR description LIKE ?)`,
+			"approved",
+			searchPattern,
+			searchPattern,
+		).
+		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&products).Error
+
+	return products, total, err
+}

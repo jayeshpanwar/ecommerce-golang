@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"ecommerce/config"
+	"ecommerce/dto"
 	"ecommerce/models"
 	"ecommerce/services"
-	"ecommerce/utils"
 	"fmt"
 	"math"
 	"path/filepath"
@@ -203,6 +203,100 @@ func GetProductById(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "Product fetched successfully",
 		"data":    product,
+	})
+}
+
+//---------------------------------------------------------------------------------
+
+func GetProductsByCategory(c *gin.Context) {
+
+	categoryID, err := strconv.ParseUint(
+		c.Param("id"),
+		10,
+		64,
+	)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Invalid category ID",
+		})
+		return
+	}
+
+	page, _ := strconv.Atoi(
+		c.DefaultQuery("page", "1"),
+	)
+
+	limit, _ := strconv.Atoi(
+		c.DefaultQuery("limit", "10"),
+	)
+
+	products, total, err :=
+		services.GetProductsByCategoryID(
+			uint(categoryID),
+			page,
+			limit,
+		)
+
+	if err != nil {
+
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"products": products,
+		"page":     page,
+		"limit":    limit,
+		"total":    total,
+	})
+
+}
+
+//---------------------------------------------------------------------------------
+
+func SearchProducts(c *gin.Context) {
+
+	query := c.Query("q")
+
+	if query == "" {
+		c.JSON(400, gin.H{
+			"error": "Search query is required",
+		})
+		return
+	}
+
+	page, _ := strconv.Atoi(
+		c.DefaultQuery("page", "1"),
+	)
+
+	limit, _ := strconv.Atoi(
+		c.DefaultQuery("limit", "10"),
+	)
+
+	products, total, err :=
+		services.SearchProducts(
+			query,
+			page,
+			limit,
+		)
+
+	if err != nil {
+
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"products": products,
+		"page":     page,
+		"limit":    limit,
+		"total":    total,
 	})
 }
 
@@ -411,12 +505,12 @@ func GetApprovedProducts(c *gin.Context) {
 		return
 	}
 
-	var response []utils.ProductResponse
+	var response []dto.ProductResponse
 
 	for _, product := range products {
 		response = append(
 			response,
-			utils.BuildProductResponse(product),
+			dto.BuildProductResponse(product),
 		)
 	}
 

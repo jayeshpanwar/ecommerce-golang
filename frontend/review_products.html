@@ -226,12 +226,16 @@
       return obj;
     }
 
-    function renderReviewItem({ productId, productName, orderId }) {
+    function renderReviewItem({ productId, productName, orderId, orderItemId }) {
       const pid = String(productId);
       const oid = String(orderId ?? '');
+      const oiid = String(orderItemId ?? '');
 
       return `
-        <div class="review-item" data-product-id="${escapeHtml(pid)}" data-order-id="${escapeHtml(oid)}">
+        <div class="review-item"
+             data-product-id="${escapeHtml(pid)}"
+             data-order-id="${escapeHtml(oid)}"
+             data-order-item-id="${escapeHtml(oiid)}">
           <div class="review-item-header">
             <div>
               <p class="product-title">${escapeHtml(productName || 'Product')}</p>
@@ -261,6 +265,7 @@
       `;
     }
 
+
     function setRating(btn, n) {
       const wrapper = btn.closest('.review-item');
       if (!wrapper) return;
@@ -283,8 +288,14 @@
         return;
       }
 
+      const orderItemId = itemEl.getAttribute('data-order-item-id');
       const rating = itemEl.querySelector('.rating-input')?.value;
       const comment = (itemEl.querySelector('.comment-input')?.value || '').trim();
+
+      if (!orderItemId) {
+        setResult('Unable to submit review: missing order item context.', 'error');
+        return;
+      }
 
       if (!rating) {
         setResult('Please select a rating (1-5).', 'error');
@@ -300,8 +311,7 @@
           method: 'POST',
           headers: authHeaders(),
           body: JSON.stringify({
-            productId: Number(productId),
-            orderId: Number(orderId),
+            order_item_id: Number(orderItemId),
             rating: Number(rating),
             comment: comment,
           }),
@@ -328,18 +338,28 @@
       }
     }
 
+
     function logout(e) {
       if (e) e.preventDefault();
       localStorage.removeItem('token');
       window.location.href = 'login.html';
     }
 
-    function loadFromQueryOrFallback() {
+    async function fetchOrderItems(orderId) {
+      const res = await fetch(`${API_BASE}/orders`, { method: 'GET', headers: authHeaders() });
+      if (!res.ok) return [];
+      const data = await res.json().catch(() => ({}));
+      const orders = data.data || [];
+      const order = orders.find((x) => String(x.order_id ?? x.OrderID) === String(orderId));
+      return (order && (order.items || [])) || [];
+    }
+
+    async function loadFromQueryOrFallback() {
       const q = getQueryParams();
 
       // Supported modes:
       // 1) review_products.html?orderId=123&productId=9&productName=Phone
-      // 2) If not provided, show a helpful message since backend "eligible reviews" endpoint isn't implemented.
+      // We use (orderId + productId) to find orderItemId required by backend.
 
       const orderId = q.orderId;
       const productId = q.productId;
@@ -348,19 +368,62 @@
       const list = document.getElementById('reviewList');
       if (!list) return;
 
-      if (orderId && productId) {
-        list.innerHTML = renderReviewItem({ productId, productName, orderId });
+      if (!orderId || !productId) {
+        list.innerHTML = `
+          <div class="muted" style="padding: 16px 0; font-size:0.95rem; line-height:1.5;">
+            No specific product context found. Open this page from <b>Orders</b> using the “Leave review” button.
+          </div>
+        `;
         return;
       }
 
-      list.innerHTML = `
-        <div class="muted" style="padding: 16px 0; font-size:0.95rem; line-height:1.5;">
-          No specific product context found. Open this page from <b>Orders</b> using the “Leave review” button.
-        </div>
-      `;
+      list.innerHTML = `<div class="muted" style="padding: 16px 0; font-size:0.95rem;">Loading your delivered order item...</div>`;
+
+      const items = await fetchOrderItems(orderId);
+
+      function extractOrderItemId(it) {
+        if (!it) return null;
+        // Common shapes in this project (try many key variants)
+        return (
+          it.order_item_id ??
+          it.orderItemId ??
+          it.orderItemID ??
+          it.order_itemId ??
+          it.item_id ??
+          it.itemId ??
+          it.id ??
+          it.ID ??
+          it.orderItem ??
+          null
+        );
+      }
+
+      // Find matching item for this product inside the order.
+      let matched = items.find(it => String(it.product_id ?? it.productId ?? it.ProductID) === String(productId));
+      if (!matched) matched = items[0];
+
+      const orderItemId = extractOrderItemId(matched);
+
+      if (!orderItemId) {
+        const sample = (matched && Object.keys(matched)) ? Object.keys(matched).slice(0, 12).join(', ') : '(no item data)';
+        list.innerHTML = `
+          <div class="muted" style="padding: 16px 0; font-size:0.95rem; line-height:1.5; color: var(--danger);">
+            Cannot submit review right now.
+            <div style="margin-top:6px; color: var(--muted); font-size:0.9rem;">
+              Backend /orders items are missing an order-item id.
+              <br/>Received item keys: ${escapeHtml(sample)}
+            </div>
+            Fix: include <b>order_item_id</b> in <b>GET /orders</b> response items.
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = renderReviewItem({ productId, productName, orderId, orderItemId });
     }
 
     loadFromQueryOrFallback();
+
     window.submitReview = submitReview;
     window.setRating = setRating;
     window.logout = logout;

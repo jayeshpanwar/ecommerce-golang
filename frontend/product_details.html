@@ -193,6 +193,14 @@
       </div>
       <div class="nav-actions">
         <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">← Back to Catalog</button>
+
+        <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='orders.html'" style="border-color: rgba(99, 102, 241, 0.45); color: #2e1065;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon" style="width:18px; height:18px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.793 1.993 1.821m-9.3 15.39c-1.118-.094-1.964-1.057-1.964-2.192V6.108c0-1.135.846-2.098 1.964-2.192m11.123 18V21a3 3 0 0 0-3-3H9.75a3 3 0 0 0-3 3v.75m11.25 0v-4.66a2.25 2.25 0 0 0-.659-1.591L15 14.25M9.75 21v-4.66a2.25 2.25 0 0 1 .659-1.591L12 14.25" />
+          </svg>
+          My Orders
+        </button>
+
         <button type="button" class="nav-btn primary-btn" onclick="window.location.href='cart.html'">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg>
           Cart
@@ -319,7 +327,7 @@
             <h1 class="product-title">${name}</h1>
             
             <div class="price-block">
-              <span class="currency">$</span>
+              <span class="currency">₹</span>
               <span class="current-price">${price}</span>
             </div>
 

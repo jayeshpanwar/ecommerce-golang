@@ -14,5 +14,5 @@ type Product struct {
 	Category    Category `json:"category"`
 
 	SellerID uint   `json:"seller_id"`
-	Status   string `json:"status"`
+	Status   string `gorm:"type:varchar(20);index" json:"status"`
 }

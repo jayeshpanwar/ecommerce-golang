@@ -117,7 +117,7 @@ body {
  font-size: 1.25rem;
  font-weight: 800;
  letter-spacing: -0.02em;
- background: linear-gradient(90deg, #ffffff, var(--muted));
+ background: linear-gradient(90deg, #330660, var(--muted));
  -webkit-background-clip: text;
  -webkit-text-fill-color: transparent;
 }
@@ -368,7 +368,7 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
 
 
 /* ==========================================================================
-  7. SHOPPING BAG / CART STRUCTURE & INTERFACES
+  7. SHOPPING BAG / CART STRUCTURE & INTERFACES (Optimized & Responsive)
   ========================================================================== */
 .marketplace-list {
  display: flex;
@@ -378,21 +378,10 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
  margin: 0 auto;
 }
 
-
-/* Fixes full-width checkout banner at the top of your cart page */
-#checkoutBtn, .checkout-now-btn, button[onclick*="checkout"], button[onclick*="Checkout"] {
- width: 100% !important;
- display: flex !important;
- margin-bottom: 20px;
-}
-
-
-/* Structural wrapper enforcing inline layout for individual item blocks */
+/* Enforce fluid flow for individual item blocks with responsive breaks */
 .cart-row, [id^="cart-item"], .cart-item {
- display: flex !important;
- flex-direction: row !important;
- align-items: center !important;
- justify-content: space-between !important;
+ display: flex;
+ flex-direction: column; /* Stack vertically on small screens */
  padding: 20px 24px;
  background: rgba(15, 23, 42, 0.55);
  border: 1px solid var(--card-border);
@@ -401,6 +390,14 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
  gap: 16px;
 }
 
+/* Row-alignment on tables, tablets, and desktop views */
+@media (min-width: 600px) {
+  .cart-row, [id^="cart-item"], .cart-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
 
 .item-info .item-name {
  margin: 0 0 6px;
@@ -414,40 +411,42 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
  color: var(--muted);
 }
 
-
 .qty-controls {
- display: flex !important;
- flex-direction: row !important;
- align-items: center !important;
+ display: flex;
+ flex-direction: row;
+ align-items: center;
+ justify-content: space-between;
  gap: 12px;
  flex-shrink: 0;
+ width: 100%; /* Spans across screen on mobile view */
 }
 
+@media (min-width: 600px) {
+  .qty-controls {
+    width: auto; /* Collapses neatly in line on desktop */
+  }
+}
 
-/* Strict layout scaling rules specifically for buttons inside any cart container */
+/* Scalable sizing inside item modules */
 .cart-row button, .cart-item button, [id^="cart-item"] button, .qty-controls button {
- width: max-content !important;
- min-width: auto !important;
- margin: 0 !important;
- padding: 8px 14px !important;
- font-size: 0.88rem !important;
- display: inline-flex !important;
+ padding: 8px 14px;
+ font-size: 0.88rem;
+ display: inline-flex;
  height: 36px;
- box-shadow: none !important;
+ box-shadow: none;
+ width: auto;
 }
-
 
 .qty-btn {
- background: rgba(255, 255, 255, 0.05) !important;
- border: 1px solid var(--card-border) !important;
- color: var(--text) !important;
+ background: rgba(255, 255, 255, 0.05);
+ border: 1px solid var(--card-border);
+ color: var(--text);
  border-radius: 8px;
 }
 .qty-btn:hover {
- background: var(--primary) !important;
- border-color: transparent !important;
+ background: var(--primary);
+ border-color: transparent;
 }
-
 
 .qty {
  font-weight: 700;
@@ -458,19 +457,18 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
  display: inline-block;
 }
 
-
 .delete-btn, button[onclick*="remove"], button[onclick*="delete"] {
- background: rgba(244, 63, 94, 0.1) !important;
- color: var(--danger) !important;
- border: 1px solid rgba(244, 63, 94, 0.2) !important;
+ background: rgba(244, 63, 94, 0.1);
+ color: var(--danger);
+ border: 1px solid rgba(244, 63, 94, 0.2);
  border-radius: 8px;
+ margin-left: auto; /* Pushes the button to the right end edge */
 }
 .delete-btn:hover, button[onclick*="remove"]:hover, button[onclick*="delete"]:hover {
- background: var(--danger) !important;
- color: white !important;
- border-color: transparent !important;
+ background: var(--danger);
+ color: white;
+ border-color: transparent;
 }
-
 
 .empty-state {
  text-align: center;
@@ -481,7 +479,6 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
  border-radius: 16px;
  background: rgba(15, 23, 42, 0.2);
 }
-
 
 /* ==========================================================================
   8. FEEDBACK, ALERTS & LOGOUT INTERFACES
@@ -515,4 +512,115 @@ button:disabled { opacity: 0.4 !important; cursor: not-allowed; transform: none 
 .loading-skeleton-wrapper { grid-column: 1 / -1; text-align: center; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .spinner { width: 28px; height: 28px; border: 3px solid rgba(255, 255, 255, 0.05); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+
+
+/* ==========================================================================
+   CHECKOUT DELIVERY ADDRESS CARD & GRID FIX
+   ========================================================================== */
+
+/* 1. Fixes the Address Cards Container */
+#addressList {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* 2. Forces individual injected rows to stay perfectly left-aligned */
+#addressList > div, 
+#addressList > label,
+.address-item-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;    /* Aligns radio button up with the top line of text */
+  justify-content: flex-start !important; /* Snaps everything to the left side */
+  gap: 14px !important;
+  padding: 16px !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  text-align: left !important;            /* Fixes text right-alignment bug */
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. Normalizes the size & behavior of the radio bubble */
+#addressList input[type="radio"] {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 2px 0 0 0 !important;          /* Perfect line-height tracking */
+  flex-shrink: 0 !important;
+  align-self: flex-start !important;
+}
+
+/* 4. Formatting the inner textual address details cleanly */
+#addressList > div > div, 
+#addressList > label > div,
+.address-text-block {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  text-align: left !important;            /* Overrides the messhed up right align */
+  color: #475569 !important;
+  font-size: 0.9rem !important;
+  width: auto !important;                 /* Stops layout blocks from jumping to the edge */
+}
+
+/* Highlight the Name field */
+#addressList strong, 
+#addressList b, 
+.address-username {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+}
+
+/* 5. Clean layout for "Add New Address" input form system */
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.address-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.address-field-label.full-width {
+  grid-column: 1 / -1;
+}
+
+.address-card-input {
+  width: 100% !important;
+  padding: 10px 14px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 0.95rem !important;
+}
+
+.address-card-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  outline: none;
+}
+
+/* Mobile responsive fallback for the address input boxes */
+@media (max-width: 540px) {
+  .address-grid {
+    grid-template-columns: 1fr;
+  }
+  .address-field-label {
+    grid-column: unset !important;
+  }
+}
 

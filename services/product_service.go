@@ -3,9 +3,9 @@ package services
 import (
 	"errors"
 
+	"ecommerce/dto"
 	"ecommerce/models"
 	"ecommerce/repositories"
-	"ecommerce/utils"
 )
 
 func CreateProduct(product *models.Product) error {
@@ -27,7 +27,7 @@ func CreateProduct(product *models.Product) error {
 
 //--------------------------------------------------------------------------------------------
 
-func GetApprovedProducts(page int, limit int) ([]utils.ProductResponse, int64, error) {
+func GetApprovedProducts(page int, limit int) ([]dto.ProductResponse, int64, error) {
 
 	if page < 1 {
 		page = 1
@@ -49,21 +49,38 @@ func GetApprovedProducts(page int, limit int) ([]utils.ProductResponse, int64, e
 		return nil, 0, err
 	}
 
-	var response []utils.ProductResponse
+	var response []dto.ProductResponse
 
 	for _, product := range products {
 
 		response = append(
 			response,
-			utils.BuildProductResponse(product),
+			dto.BuildProductResponse(product),
 		)
 	}
 
 	return response, total, nil
 }
 
+//--------------------------------------------------------------------------------------------
+
+func GetProductsByCategoryID(
+	categoryID uint,
+	page int,
+	limit int,
+) ([]models.Product, int64, error) {
+
+	offset := (page - 1) * limit
+
+	return repositories.GetProductsByCategoryID(
+		categoryID,
+		limit,
+		offset,
+	)
+}
+
 // --------------------------------------------------------------------------------------------
-func GetApprovedProductByID(id uint) (*utils.ProductResponse, error) {
+func GetApprovedProductByID(id uint) (*dto.ProductResponse, error) {
 
 	product, err :=
 		repositories.GetApprovedProductByID(id)
@@ -73,7 +90,7 @@ func GetApprovedProductByID(id uint) (*utils.ProductResponse, error) {
 	}
 
 	response :=
-		utils.BuildProductResponse(product)
+		dto.BuildProductResponse(product)
 
 	return &response, nil
 }
@@ -133,7 +150,7 @@ func RejectProduct(productID uint) error {
 // -----------------------------------------------------------------------------------------------
 func GetSellerProducts(
 	sellerID uint,
-) ([]utils.ProductResponse, error) {
+) ([]dto.ProductResponse, error) {
 
 	products, err :=
 		repositories.GetProductsBySellerID(
@@ -144,13 +161,13 @@ func GetSellerProducts(
 		return nil, err
 	}
 
-	var response []utils.ProductResponse
+	var response []dto.ProductResponse
 
 	for _, product := range products {
 
 		response = append(
 			response,
-			utils.BuildProductResponse(product),
+			dto.BuildProductResponse(product),
 		)
 	}
 
@@ -158,7 +175,7 @@ func GetSellerProducts(
 }
 
 // -----------------------------------------------------------------------------------------------
-func GetPendingProducts() ([]utils.ProductResponse, error) {
+func GetPendingProducts() ([]dto.ProductResponse, error) {
 
 	products, err :=
 		repositories.GetPendingProducts()
@@ -167,15 +184,32 @@ func GetPendingProducts() ([]utils.ProductResponse, error) {
 		return nil, err
 	}
 
-	var response []utils.ProductResponse
+	var response []dto.ProductResponse
 
 	for _, product := range products {
 
 		response = append(
 			response,
-			utils.BuildProductResponse(product),
+			dto.BuildProductResponse(product),
 		)
 	}
 
 	return response, nil
+}
+
+//-----------------------------------------------------------------------------------------------
+
+func SearchProducts(
+	query string,
+	page int,
+	limit int,
+) ([]models.Product, int64, error) {
+
+	offset := (page - 1) * limit
+
+	return repositories.SearchProducts(
+		query,
+		limit,
+		offset,
+	)
 }

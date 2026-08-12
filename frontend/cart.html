@@ -6,202 +6,645 @@
   <title>Your Cart - ShopSphere</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* --- Smooth View Transition States --- */
-    .checkout-summary {
-      background: var(--card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    /* --- Modern E-Commerce Light Theme (Flipkart/Amazon Hybrid) --- */
+    :root {
+      --bg-color: #f1f3f6;       
+      --surface: #ffffff;        
+      --border-color: #dbdbdb;   
+      --text-main: #212121;      
+      --text-muted: #878787;     
+      --primary: #733fec;        
+      --success: #388e3c;        
+      --action-orange: #fb641b;  
     }
 
-    .summary-card {
-      flex: 1;
-      min-width: 160px;
-      padding: 16px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .summary-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 6px;
-    }
+    .ambient-bg { display: none; }
 
-    .summary-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    /* Fixed Actions Layout Bar */
-    .cart-actions-bar {
-      margin-top: 24px;
+    /* --- Navbar Overhaul --- */
+    .navbar {
+      padding: 0 16px;
+      height: 60px;
+      background: var(--primary);
+      box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
       display: flex;
-      justify-content: flex-end;
+      align-items: center;
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1248px;
+      margin: 0 auto;
+    }
+    
+    .brand-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    
+    .nav-brand-name {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-style: italic;
+      letter-spacing: 0.5px;
     }
 
-    .cart-actions-bar button {
-      width: max-content !important;
-      padding: 12px 32px;
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.2);
     }
 
-    /* Checkout Items Preview Minimalist List */
+    /* --- Two-Column Layout Grid --- */
+    .storefront-container {
+      max-width: 1248px;
+      margin: 24px auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+
+    .storefront-header {
+      background: var(--surface);
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .storefront-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+      margin-top: 2px;
+    }
+
+    @media (min-width: 960px) {
+      .layout-grid {
+        grid-template-columns: 1fr 380px;
+      }
+    }
+
+    /* --- Left Container Sections --- */
+    .checkout-main-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .content-card {
+      background: var(--surface);
+      border-radius: 2px;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* --- Cart Items Design --- */
+    .marketplace-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-row {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-bottom: 1px solid #f0f0f0;
+      padding: 24px;
+      gap: 16px;
+    }
+
+    @media (min-width: 600px) {
+      .cart-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+    
+    .cart-row:last-child {
+      border-bottom: none;
+    }
+
+    .item-info .item-name {
+      margin: 0 0 8px 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .item-info .meta {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .qty-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-main);
+      font-size: 1.2rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .qty-btn:hover:not([disabled]) {
+      border-color: #b5b5b5;
+      background: #f9f9f9;
+    }
+
+    .qty-btn[disabled] {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .qty {
+      font-size: 0.95rem;
+      font-weight: 600;
+      min-width: 36px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      padding: 4px 0;
+      background: #fff;
+    }
+
+    .delete-btn {
+      display: inline-flex;
+      align-items: center;
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-main) !important;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 12px !important;
+      margin-left: auto;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    @media (min-width: 600px) {
+      .delete-btn {
+        margin-left: 16px;
+      }
+    }
+
+    .delete-btn:hover {
+      color: var(--primary) !important;
+    }
+
+    /* Fixed Actions Bottom Row */
+    .cart-actions-bar {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      box-shadow: 0 -2px 10px 0 rgba(0,0,0,0.05);
+      border-top: 1px solid #f0f0f0;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .cart-actions-bar {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+    }
+
+    #checkoutBtn, #confirmOrderBtn {
+      background: var(--action-orange);
+      color: #ffffff;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 14px 32px;
+      border-radius: 2px;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      width: 100%;
+      text-align: center;
+    }
+
+    @media (min-width: 600px) {
+      #checkoutBtn, #confirmOrderBtn {
+        width: auto;
+      }
+    }
+
+    #checkoutBtn:hover:not([disabled]), #confirmOrderBtn:hover:not([disabled]) {
+      background: #7220e5;
+    }
+
+    #checkoutBtn[disabled], #confirmOrderBtn[disabled] {
+      background: #e0e0e0;
+      color: #9e9e9e;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* --- Right Sticky Sidebar ("Price Details") --- */
+    .checkout-summary {
+      background: var(--surface);
+      border-radius: 2px;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+      position: static;
+    }
+
+    @media (min-width: 960px) {
+      .checkout-summary {
+        position: sticky;
+        top: 80px;
+      }
+    }
+
+    .sidebar-header {
+      font-size: 1rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-content {
+      padding: 24px;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 0.98rem;
+    }
+
+    .price-total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border-color);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Checkout Items Minimal Preview */
     .checkout-preview-list {
-      margin: 20px 0;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 12px 18px;
-      border: 1px solid rgba(255, 255, 255, 0.02);
+      margin-bottom: 20px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      border-radius: 2px;
+      padding: 4px 16px;
     }
     
     .checkout-preview-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.9rem;
     }
     .checkout-preview-item:last-child {
       border-bottom: none;
     }
 
-    /* --- ✨ NEW: Dustbin Animation Effect ✨ --- */
+    .empty-state {
+      background: var(--surface);
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* --- Forms & Step Sections --- */
+    .step-section-inner {
+      padding: 24px;
+    }
+
+    .step-title {
+      font-size: 1.1rem; 
+      margin-bottom: 20px; 
+      font-weight: 600;
+      color: var(--text-main);
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+
+    .address-grid {
+      display: grid; 
+      grid-template-columns: 1fr; /* Mobile default */
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 600px) {
+      .address-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .address-grid label {
+      display: block; /* Ensures inputs render below labels properly */
+      font-size: 0.85rem; 
+      color: var(--text-muted);
+    }
+
+    .address-card-input {
+      width: 100%; 
+      margin-top: 8px; 
+      padding: 12px 14px; 
+      border-radius: 4px; 
+      border: 1px solid var(--border-color); 
+      background: #ffffff; 
+      color: var(--text-main); 
+      box-sizing: border-box;
+      outline: none;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+    .address-card-input:focus {
+      border-color: var(--primary);
+    }
+
+    .secondary-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px 24px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border-radius: 2px;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    @media (min-width: 600px) {
+      .secondary-btn {
+        width: auto;
+      }
+    }
+
+    .secondary-btn:hover {
+      background: #f9f9f9;
+    }
+
+    /* Result Banner */
+    .result {
+      padding: 12px 16px;
+      border-radius: 2px;
+      margin-bottom: 16px;
+      display: none;
+      font-size: 0.95rem;
+    }
+    .result.success { display: block; background: #e8f5e9; color: var(--success); border: 1px solid #c8e6c9; }
+    .result.error { display: block; background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+    /* Payment Radio Alignments */
+    .payment-option-label {
+      display: flex; 
+      align-items: flex-start; /* Fixes wrap alignment */
+      gap: 12px; 
+      cursor: pointer; 
+      padding: 16px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 4px; 
+      background: #fbfbfb;
+    }
+    .payment-option-label input {
+      margin-top: 4px; /* Align radio with first line of text */
+    }
+
+    /* --- Dustbin Animation Effect --- */
     .removing-dustbin {
-      /* Binds the toss and shrink animation */
-      animation: dustbinFall 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
-      pointer-events: none; /* Prevents double-clicking during animation */
+      animation: dustbinFall 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+      pointer-events: none;
       overflow: hidden;
     }
 
     @keyframes dustbinFall {
-      0% { 
-        transform: scale(1) rotate(0); 
-        opacity: 1; 
-        max-height: 120px; 
-        margin-bottom: 14px;
-      }
-      30% { 
-        /* Slight pop up before falling */
-        transform: scale(1.02) translateY(-5px) rotate(-1deg); 
-        opacity: 0.9; 
-        max-height: 120px;
-        margin-bottom: 14px;
-      }
-      100% { 
-        /* Tumble down, shrink, fade out, and collapse layout space */
-        transform: scale(0.3) translateY(80px) rotate(15deg); 
-        opacity: 0; 
-        max-height: 0px; 
-        margin-bottom: 0px; 
-        padding-top: 0; 
-        padding-bottom: 0; 
-        border-width: 0;
-      }
+      0% { transform: scale(1); opacity: 1; max-height: 200px; }
+      100% { transform: scale(0.8) translateY(20px); opacity: 0; max-height: 0px; padding: 0; border: 0; margin: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="ambient-bg"></div>
 
   <nav class="navbar">
     <div class="nav-container">
-      <div class="brand-logo-group">
-        <div class="brand-logo small-logo">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-          </svg>
-        </div>
+      <div class="brand-logo-group" onclick="window.location.href='products.html'">
         <span class="nav-brand-name">ShopSphere</span>
       </div>
-      <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='products.html'">← Back to Store</button>
+      <button type="button" class="nav-btn" onclick="window.location.href='products.html'">← Back</button>
     </div>
   </nav>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-  <main class="storefront-container" style="max-width: 850px;">
-    <div class="storefront-header">
-      <h2 id="cartTitle">Your Shopping Bag</h2>
-    </div>
-
+  <main class="storefront-container">
     <p id="result" class="result" aria-live="polite"></p>
 
-    <div id="cartListSection">
-      <div id="cartItems" class="list marketplace-list"></div>
+    <div class="layout-grid">
       
-      <div class="cart-actions-bar" id="checkoutBtnWrapper">
-        <button type="button" class="nav-btn primary-btn" id="checkoutBtn" onclick="onCheckoutClick()" disabled>
-          Proceed to Checkout →
-        </button>
-      </div>
-    </div>
-
-    <div class="checkout-summary" id="checkoutSection" style="display: none;">
-      <div class="section-title" style="font-size: 1.3rem; margin-bottom: 4px; font-weight: 700;">Secure Checkout</div>
-      <p class="muted" style="font-size: 0.85rem; margin-bottom: 16px;">Please review the items in your order below.</p>
-      
-      <div id="checkoutItemsPreview" class="checkout-preview-list"></div>
-      
-      <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
-        <div class="summary-card">
-          <div class="summary-label">Total Items</div>
-          <div id="totalItems" class="summary-value">0</div>
-        </div>
-        <div class="summary-card" style="border-left: 2px solid var(--primary);">
-          <div class="summary-label">Total Order Price</div>
-          <div id="totalPrice" class="summary-value" style="color: var(--success);">$0.00</div>
-        </div>
-      </div>
-
-      <div style="margin-bottom: 18px; padding: 14px 16px; border: 1px solid var(--card-border); border-radius: 14px; background: rgba(0,0,0,0.18);">
-        <div style="font-weight: 800; margin-bottom: 10px;">Choose Payment Method</div>
-        <div style="display:flex; gap: 14px; flex-wrap: wrap;">
-          <label style="display:flex; align-items:center; gap: 10px; cursor:pointer;">
-            <input type="radio" name="payment_method" value="cod" id="pmCOD" checked />
-            <span style="font-weight: 700;">Pay via COD</span>
-          </label>
-          <label style="display:flex; align-items:center; gap: 10px; cursor:pointer;">
-            <input type="radio" name="payment_method" value="razorpay" id="pmRazorpay" />
-            <span style="font-weight: 700;">Pay via Razorpay (Online)</span>
-          </label>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid var(--card-border); padding-top: 20px;">
-        <button type="button" class="nav-btn secondary-btn" id="modifyItemsBtn" onclick="closeCheckout()" style="width: auto !important; padding: 10px 20px;">
-          ← Modify Items
-        </button>
+      <div class="checkout-main-panel">
         
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <span id="summaryHint" class="muted" style="font-size: 0.88rem;">Review totals then submit.</span>
-          <button type="button" class="nav-btn primary-btn" id="confirmOrderBtn" onclick="placeOrder()" style="width: auto !important; padding: 12px 36px;" disabled>
-            ⚡ Place Order
-          </button>
+        <div id="cartListSection" class="content-card">
+          <div class="storefront-header">
+            <h2 id="cartTitle">Your Shopping Bag</h2>
+          </div>
+          <div id="cartItems" class="list marketplace-list"></div>
+          
+          <div class="cart-actions-bar" id="checkoutBtnWrapper">
+            <button type="button" id="checkoutBtn" onclick="onCheckoutClick()" disabled>
+              Proceed to Checkout
+            </button>
+          </div>
+        </div>
+
+        <div class="content-card" id="checkoutSection" style="display: none;">
+          <div class="storefront-header">
+            <h2 style="font-size: 1.15rem; font-weight: 600;">Delivery &amp; Payment</h2>
+          </div>
+
+          <div class="step-section-inner" style="border-bottom: 1px solid #f0f0f0;">
+            <div class="step-title">1. Delivery Address</div>
+            <div id="addressSelector" style="display:flex; flex-direction:column; gap:10px;">
+              <div style="color: var(--text-muted); font-size: 0.95rem;" id="addressStatus">Loading saved addresses...</div>
+              <div id="addressList" style="display:flex; flex-direction:column; gap:12px;"></div>
+            </div>
+
+            <div style="margin-top:24px; padding-top:24px; border-top: 1px dashed var(--border-color);">
+              <div style="font-weight: 600; margin-bottom: 8px; font-size: 1rem; color: var(--text-main)">Add New Address</div>
+              
+              <div class="address-grid">
+                <label>Full Name *
+                  <input id="addrFullName" type="text" placeholder="e.g. John Doe" class="address-card-input" />
+                </label>
+                <label>Phone *
+                  <input id="addrPhone" type="text" placeholder="e.g. 9876543210" class="address-card-input" />
+                </label>
+                <label style="grid-column: 1 / -1;">Address Line 1 *
+                  <input id="addrLine1" type="text" placeholder="House No, Street, Area" class="address-card-input" />
+                </label>
+                <label style="grid-column: 1 / -1;">Address Line 2 (optional)
+                  <input id="addrLine2" type="text" placeholder="Landmark / Apartment Suite" class="address-card-input" />
+                </label>
+                <label>City *
+                  <input id="addrCity" type="text" placeholder="e.g. Bengaluru" class="address-card-input" />
+                </label>
+                <label>State *
+                  <input id="addrState" type="text" placeholder="e.g. Karnataka" class="address-card-input" />
+                </label>
+                <label style="grid-column: 1 / -1;">Pincode *
+                  <input id="addrPincode" type="text" placeholder="e.g. 560001" class="address-card-input" />
+                </label>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
+                <button type="button" class="secondary-btn" onclick="addAddress()">
+                  Save and Deliver Here
+                </button>
+                <span id="addAddressResult" style="font-size:0.9rem; color: var(--success); font-weight: 500;"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-section-inner">
+            <div class="step-title">2. Payment Method</div>
+            <div style="display:flex; flex-direction: column; gap: 16px; max-width: 500px;">
+              <label class="payment-option-label">
+                <input type="radio" name="payment_method" value="cod" id="pmCOD" checked />
+                <div>
+                  <span style="font-weight: 600; font-size: 0.98rem; display:block; margin-bottom: 4px;">Cash on Delivery (COD)</span>
+                  <span style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; display:block;">Pay with cash when your package arrives at your doorstep.</span>
+                </div>
+              </label>
+              
+              <label class="payment-option-label">
+                <input type="radio" name="payment_method" value="razorpay" id="pmRazorpay" />
+                <div>
+                  <span style="font-weight: 600; font-size: 0.98rem; display:block; margin-bottom: 4px;">Online Payment (Razorpay)</span>
+                  <span style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; display:block;">Securely pay using Credit/Debit Cards, UPI, or NetBanking.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="cart-actions-bar" style="border-top: 1px solid #f0f0f0;">
+            <button type="button" class="secondary-btn" id="modifyItemsBtn" onclick="closeCheckout()">
+              ← Edit Cart
+            </button>
+            <button type="button" id="confirmOrderBtn" onclick="placeOrder()" disabled>
+              ⚡ Place Order
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="checkout-summary">
+        <div class="sidebar-header">Price Details</div>
+        <div class="sidebar-content">
+          
+          <div id="checkoutItemsPreview"></div>
+          
+          <div class="price-row">
+            <div style="color: #212121;">Price (<span id="totalItems">0</span> items)</div>
+            <div id="totalPrice" style="color: #212121; font-weight: 500;">$0.00</div>
+          </div>
+          
+          <div class="price-row">
+            <div style="color: #212121;">Delivery Charges</div>
+            <div style="color: var(--success); font-weight: 500;">FREE</div>
+          </div>
+          
+          <div class="price-total-row">
+            <div>Total Amount</div>
+            <div id="totalPriceFinal" style="color: var(--text-main); font-weight: 700;">$0.00</div>
+          </div>
+
+          <div style="margin-top: 24px; font-size: 0.88rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;" id="summaryHintWrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height:18px; color: #878787; flex-shrink: 0;">
+              <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
+            </svg>
+            <span id="summaryHint">Safe and Secure Payments.</span>
+          </div>
         </div>
       </div>
+
     </div>
   </main>
 
   <script src="app.js"></script>
   <script>
     const API_BASE = 'http://localhost:8080';
-    let globalCartItems = []; // Local mirror to safely keep product track
+    let globalCartItems = []; 
 
     function getToken() { return localStorage.getItem('token'); }
     function authHeaders() { const token = getToken(); return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }; }
 
     function setResult(message, type) {
       const el = document.getElementById('result');
-      el.className = `result ${type || ''}`;
-      el.innerText = message || '';
+      if (!el) return;
+      if (!message) {
+        el.className = 'result';
+        el.innerText = '';
+        return;
+      }
+      el.className = `result ${type === 'success' ? 'success' : 'error'}`;
+      el.innerText = message;
+      // Auto-scroll to top so user sees the message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function clearAuthAndRedirectToLogin() {
@@ -216,7 +659,6 @@
         
         const res = await fetch(`${API_BASE}/cart`, { method: 'GET', headers: authHeaders() });
         
-        // If order was just placed, backend safely drops 200 empty status or 404 block
         if (res.status === 401) {
           clearAuthAndRedirectToLogin();
           return;
@@ -242,23 +684,26 @@
           <div class="cart-row" id="cart-row-${it.cart_item_id ?? it.id}">
             <div class="item-info">
               <h3 class="item-name">${it.product_name ?? it.ProductName ?? 'Item'}</h3>
-              <p class="meta">Unit Price: <span style="color:var(--primary); font-weight:700;">$${Number(it.price ?? it.Price).toFixed(2)}</span></p>
+              <p class="meta">Price: <span style="color: var(--text-main); font-weight:600;">$${Number(it.price ?? it.Price).toFixed(2)}</span></p>
             </div>
             <div class="qty-controls">
               <button class="qty-btn" onclick="decreaseQty(${it.cart_item_id ?? it.id})" ${it.quantity <= 1 ? 'disabled' : ''}>-</button>
               <span class="qty">${it.quantity}</span>
               <button class="qty-btn" onclick="increaseQty(${it.product_id ?? it.ProductID})">+</button>
               
-              <button class="qty-btn delete-btn" onclick="deleteCartItem(${it.cart_item_id ?? it.id})">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 16px; height: 16px; margin-right: 4px;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                </svg>
+              <button class="delete-btn" onclick="deleteCartItem(${it.cart_item_id ?? it.id})">
                 Remove
               </button>
             </div>
           </div>
         `).join('');
         document.getElementById('cartItems').innerHTML = html;
+
+        // Dynamically compute global totals for sidebar safety mirror
+        const totalItems = globalCartItems.reduce((sum, it) => sum + it.quantity, 0);
+        const totalAmount = globalCartItems.reduce((sum, it) => sum + (it.quantity * (it.price ?? it.Price ?? 0)), 0);
+        setSummary(totalItems, totalAmount);
+
       } catch (e) { 
         setResult('Connection error fetching cart.', 'error'); 
       }
@@ -269,8 +714,8 @@
       const checkoutBtn = document.getElementById('checkoutBtn');
       if (checkoutBtn) {
         checkoutBtn.disabled = true;
-        checkoutBtn.style.display = 'inline-flex';
       }
+      setSummary(0, 0);
     }
 
     window.increaseQty = async (pid) => {
@@ -305,17 +750,13 @@
       const token = getToken();
       if (!token) { clearAuthAndRedirectToLogin(); return; }
 
-      // 1. Locate the specific cart row
       const rowElement = document.getElementById(`cart-row-${cid}`);
       
-      // 2. Trigger the CSS animation if the element exists
       if (rowElement) {
         rowElement.classList.add('removing-dustbin');
-        // Wait exactly 450ms for the "toss away" animation to finish
-        await new Promise(resolve => setTimeout(resolve, 450));
+        await new Promise(resolve => setTimeout(resolve, 380));
       }
 
-      // 3. Make the API Call to strictly delete the item from the DB backend
       try {
         const res = await fetch(`${API_BASE}/cart/items/${cid}`, { method: 'DELETE', headers: authHeaders() }); 
         if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
@@ -323,20 +764,21 @@
         console.error('Delete request failed:', e);
       }
       
-      // 4. Refetch the updated data logic 
       await fetchCart();
     };
 
     function setSummary(totItems, totPrice) {
+      const formattedPrice = `$${Number(totPrice ?? 0).toFixed(2)}`;
       document.getElementById('totalItems').innerText = String(totItems ?? 0);
-      document.getElementById('totalPrice').innerText = `$${Number(totPrice ?? 0).toFixed(2)}`;
+      document.getElementById('totalPrice').innerText = formattedPrice;
+      document.getElementById('totalPriceFinal').innerText = formattedPrice;
 
       const confirmBtn = document.getElementById('confirmOrderBtn');
       const hint = document.getElementById('summaryHint');
       const hasItems = (totItems ?? 0) > 0;
       
       if (confirmBtn) confirmBtn.disabled = !hasItems;
-      if (hint) hint.innerHTML = hasItems ? 'Ready to submit order.' : 'Bag is empty.';
+      if (hint) hint.innerHTML = hasItems ? 'Safe and Secure Payments.' : 'Bag is empty.';
     }
 
     window.loadCheckoutSummary = async () => {
@@ -350,7 +792,6 @@
           return { ok: false };
         }
         if (!res.ok) {
-          setSummary(0, 0);
           return { ok: false };
         }
         
@@ -358,11 +799,9 @@
         const items = Array.isArray(data.items) ? data.items : globalCartItems;
         const totalItems = items.reduce((sum, it) => sum + (Number(it.quantity ?? it.Quantity ?? 0) || 0), 0);
         const totalAmount = data.total_amount ?? data.totalAmount ?? 0;
-        
         setSummary(totalItems, totalAmount);
         return { ok: true, totalItems, totalAmount };
       } catch (e) {
-        setSummary(0, 0);
         return { ok: false };
       }
     };
@@ -372,7 +811,6 @@
       if (checkoutBtn) checkoutBtn.disabled = true;
       setResult('', null);
 
-      // Refresh data array explicitly
       await fetchCart();
 
       if (globalCartItems.length === 0) {
@@ -380,42 +818,176 @@
         if (checkoutBtn) checkoutBtn.disabled = false;
         return;
       }
-
+      
       const res = await loadCheckoutSummary();
       if (!res || !res.ok) {
-        // Fallback manually calculating totals if specific endpoint drops out
         const totalItems = globalCartItems.reduce((sum, it) => sum + it.quantity, 0);
         const totalAmount = globalCartItems.reduce((sum, it) => sum + (it.quantity * (it.price ?? it.Price ?? 0)), 0);
         setSummary(totalItems, totalAmount);
       }
 
-      // Render out detailed item rows into Checkout View Panel
-      const previewHtml = globalCartItems.map(it => `
+      const previewHtml = globalCartItems.length > 0 ? `<div class="checkout-preview-list">` + globalCartItems.map(it => `
         <div class="checkout-preview-item">
           <div>
-            <span style="font-weight: 600; color: #fff;">${it.product_name ?? it.ProductName ?? 'Item'}</span>
-            <span class="muted" style="font-size: 0.85rem; margin-left: 8px;">(x${it.quantity})</span>
+            <span style="font-weight: 500; color: var(--text-main);">${it.product_name ?? it.ProductName ?? 'Item'}</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 6px;">(x${it.quantity})</span>
           </div>
-          <div style="font-weight: 700; color: #e2e8f0;">
+          <div style="font-weight: 600; color: var(--text-main);">
             $${(Number(it.price ?? it.Price ?? 0) * it.quantity).toFixed(2)}
           </div>
         </div>
-      `).join('');
+      `).join('') + `</div>` : '';
+      
       document.getElementById('checkoutItemsPreview').innerHTML = previewHtml;
-
-      // Swap Workspace View state elements
       document.getElementById('cartListSection').style.display = 'none';
       document.getElementById('checkoutSection').style.display = 'block';
-      document.getElementById('cartTitle').innerText = 'Order Checkout';
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.closeCheckout = () => {
       document.getElementById('checkoutSection').style.display = 'none';
       document.getElementById('cartListSection').style.display = 'block';
-      document.getElementById('cartTitle').innerText = 'Your Shopping Bag';
+      document.getElementById('checkoutItemsPreview').innerHTML = '';
       
       const checkoutBtn = document.getElementById('checkoutBtn');
       if (checkoutBtn) checkoutBtn.disabled = globalCartItems.length === 0;
+    };
+
+    function getSelectedAddressId() {
+      const checked = document.querySelector('input[name="address_id"]:checked');
+      if (!checked) return null;
+      const v = checked.value;
+      const num = Number(v);
+      return Number.isFinite(num) && num > 0 ? num : null;
+    }
+
+    async function fetchAddresses() {
+      const token = getToken();
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/addresses`, { method: 'GET', headers: authHeaders() });
+        if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          document.getElementById('addressStatus').innerText = data?.error || data?.message || 'Failed to load addresses.';
+          document.getElementById('addressList').innerHTML = '';
+          return;
+        }
+        const addresses = Array.isArray(data.data) ? data.data : [];
+        renderAddresses(addresses);
+      } catch (e) {
+        document.getElementById('addressStatus').innerText = 'Connection error loading addresses.';
+      }
+    }
+
+    function renderAddresses(addresses) {
+      const status = document.getElementById('addressStatus');
+      const list = document.getElementById('addressList');
+      if (!status || !list) return;
+
+      if (!addresses || addresses.length === 0) {
+        status.innerText = 'No saved addresses found. Please add one below.';
+        list.innerHTML = '';
+        return;
+      }
+
+      status.innerText = 'Select a delivery location:';
+
+      const html = addresses.map(a => {
+        const id = a.ID ?? a.id ?? a.address_id ?? a.AddressID;
+        const full = [a.address_line_1 ?? a.AddressLine1, a.address_line_2 ?? a.AddressLine2].filter(Boolean).join(', ');
+        const cityState = [a.city ?? a.City, a.state ?? a.State].filter(Boolean).join(', ');
+        const line = [full, cityState, a.pincode ?? a.Pincode].filter(Boolean).join(' - ');
+
+        const isDefault = Boolean(a.is_default ?? a.IsDefault);
+        const isChecked = isDefault || false;
+
+        return `
+          <label style="display:flex; gap:12px; align-items:flex-start; padding:16px; border:1px solid var(--border-color); border-radius:4px; background: #ffffff; cursor:pointer;">
+            <input type="radio" name="address_id" value="${id}" ${isChecked ? 'checked' : ''} style="margin-top:4px;" />
+            <div style="min-width:0;">
+              <div style="font-weight:600; color: var(--text-main); margin-bottom:4px; font-size:0.98rem;">
+                ${a.full_name ?? a.FullName ?? 'Recipient'}
+                ${a.phone ?? a.Phone ? `<span style="font-weight:500; color: var(--text-muted); font-size:0.88rem; margin-left: 6px;"> • Phone: ${escapeHtml(a.phone ?? a.Phone)}</span>` : ''}
+              </div>
+              <div style="font-size:0.9rem; line-height:1.4; color: var(--text-muted);">
+                ${escapeHtml(line || '')}
+              </div>
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      list.innerHTML = html;
+
+      const selected = document.querySelector('input[name="address_id"]:checked');
+      if (!selected) {
+        const first = document.querySelector('input[name="address_id"]');
+        if (first) first.checked = true;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    window.addAddress = async () => {
+      try {
+        const token = getToken();
+        if (!token) { setResult('Login required.', 'error'); return; }
+        const payload = {
+          full_name: document.getElementById('addrFullName').value.trim(),
+          phone: document.getElementById('addrPhone').value.trim(),
+          address_line_1: document.getElementById('addrLine1').value.trim(),
+          address_line_2: document.getElementById('addrLine2').value.trim(),
+          city: document.getElementById('addrCity').value.trim(),
+          state: document.getElementById('addrState').value.trim(),
+          pincode: document.getElementById('addrPincode').value.trim(),
+        };
+
+        if (!payload.full_name || !payload.phone || !payload.address_line_1 || !payload.city || !payload.state || !payload.pincode) {
+          document.getElementById('addAddressResult').innerText = 'Please complete all required fields.';
+          document.getElementById('addAddressResult').style.color = '#c62828';
+          return;
+        }
+        document.getElementById('addAddressResult').innerText = 'Saving address...';
+        document.getElementById('addAddressResult').style.color = 'var(--text-muted)';
+
+        const res = await fetch(`${API_BASE}/addresses`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.status === 401) { clearAuthAndRedirectToLogin(); return; }
+
+        if (!res.ok) {
+          document.getElementById('addAddressResult').innerText = data?.error || data?.message || 'Failed to save address.';
+          document.getElementById('addAddressResult').style.color = '#c62828';
+          return;
+        }
+
+        document.getElementById('addAddressResult').innerText = 'Address successfully linked.';
+        document.getElementById('addAddressResult').style.color = 'var(--success)';
+        await fetchAddresses();
+        
+        ['addrFullName','addrPhone','addrLine1','addrLine2','addrCity','addrState','addrPincode'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+      } catch (e) {
+        document.getElementById('addAddressResult').innerText = 'Network error saving address.';
+        document.getElementById('addAddressResult').style.color = '#c62828';
+      }
     };
 
     window.placeOrder = async () => {
@@ -425,9 +997,20 @@
 
         const confirmBtn = document.getElementById('confirmOrderBtn');
         if (confirmBtn) confirmBtn.disabled = true;
+        const addressId = getSelectedAddressId();
+        if (!addressId) {
+          setResult('Please select a delivery address.', 'error');
+          if (confirmBtn) confirmBtn.disabled = false;
+          return;
+        }
 
-        // 1) Create backend order from cart
-        const res = await fetch(`${API_BASE}/orders`, { method: 'POST', headers: authHeaders() });
+        const selectedPayment = document.querySelector('input[name="payment_method"]:checked')?.value || 'cod';
+        
+        const res = await fetch(`${API_BASE}/orders`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ address_id: addressId, payment_method: selectedPayment }),
+        });
         const data = await res.json().catch(() => ({}));
 
         if (res.status === 401) {
@@ -435,7 +1018,6 @@
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
-
         if (!res.ok) {
           setResult(data.error || data.message || 'Failed to place order', 'error');
           if (confirmBtn) confirmBtn.disabled = false;
@@ -444,23 +1026,18 @@
 
         const orderId = data.order_id ?? data.orderId;
         if (!orderId) {
-          setResult('Order created but missing order_id for payment.', 'error');
+          setResult('Order created but missing configuration parameters.', 'error');
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
 
-        // Decide payment method
-        const selectedPayment = document.querySelector('input[name="payment_method"]:checked')?.value || 'cod';
-
         if (selectedPayment === 'cod') {
-          // COD flow
-          setResult('Placing order with COD...', 'success');
+          setResult('Processing your COD transaction request...', 'success');
 
           const codRes = await fetch(`${API_BASE}/payment/COD/${orderId}`, {
             method: 'POST',
             headers: authHeaders(),
           });
-
           const codData = await codRes.json().catch(() => ({}));
 
           if (codRes.status === 401) {
@@ -468,35 +1045,28 @@
             if (confirmBtn) confirmBtn.disabled = false;
             return;
           }
-
           if (!codRes.ok) {
-            setResult(codData.error || codData.message || 'Failed to place COD order.', 'error');
+            setResult(codData.error || codData.message || 'Failed to finalize COD allocation.', 'error');
             if (confirmBtn) confirmBtn.disabled = false;
             return;
           }
+          setResult('Order placed successfully! Pay securely with COD at delivery.', 'success');
 
-          setResult('Order placed successfully! Pay with COD on delivery.', 'success');
-
-          // Clear UI cart
           globalCartItems = [];
           setSummary(0, 0);
           document.getElementById('checkoutItemsPreview').innerHTML = '';
           document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
           document.getElementById('modifyItemsBtn').style.display = 'none';
-          document.getElementById('summaryHint').innerText = 'COD order placed.';
 
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
 
-        // Razorpay flow
-        setResult('Opening Razorpay...', 'success');
-
+        setResult('Initializing secure payment verification gateway...', 'success');
         const createRes = await fetch(`${API_BASE}/payments/create-order/${orderId}`, {
           method: 'POST',
           headers: authHeaders(),
         });
-
         const createData = await createRes.json().catch(() => ({}));
 
         if (createRes.status === 401) {
@@ -504,31 +1074,28 @@
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
-
         if (!createRes.ok) {
-          setResult(createData.error || createData.message || 'Failed to init payment.', 'error');
+          setResult(createData.error || createData.message || 'Payment system authentication failure.', 'error');
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
 
-        // Open Razorpay Checkout
         if (!window.Razorpay) {
-          setResult('Razorpay script not loaded.', 'error');
+          setResult('Merchant billing dependencies missing.', 'error');
           if (confirmBtn) confirmBtn.disabled = false;
           return;
         }
-
+        
         const options = {
           key: createData.key,
           amount: createData.amount,
           currency: createData.currency,
-          name: 'My Ecommerce Store',
-          description: 'Order Payment',
+          name: 'ShopSphere Marketplace',
+          description: 'Secure Order Checkout Verification',
           order_id: createData.razorpay_order_id,
-          theme: { color: '#3399cc' },
+          theme: { color: '#2874f0' },
           handler: async function (response) {
             try {
-              // 4) Verify payment with backend
               const verifyRes = await fetch(`${API_BASE}/payments/verify`, {
                 method: 'POST',
                 headers: authHeaders(),
@@ -538,63 +1105,40 @@
                   signature: response.razorpay_signature,
                 }),
               });
-
               const verifyData = await verifyRes.json().catch(() => ({}));
 
               if (!verifyRes.ok) {
-                // Verification endpoint failed. Payment might still be processed via webhook.
-                // Immediately show success to prevent blocking the user.
-                // (Backend status will still be updated asynchronously.)
-                const msg = verifyData?.error || verifyData?.message || 'Payment verification failed.';
-                console.warn('verify failed:', msg);
-
-                setResult('Payment successful! Order will be updated shortly.', 'success');
-
-                // Clear UI cart now (order will be marked paid by webhook)
+                console.warn('Asynchronous capture verification pending confirmation logs:', verifyData?.error);
+                setResult('Payment authorized! Updating fulfillment logs shortly.', 'success');
                 globalCartItems = [];
                 setSummary(0, 0);
-                document.getElementById('checkoutItemsPreview').innerHTML = '';
-                document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
-                document.getElementById('modifyItemsBtn').style.display = 'none';
-                document.getElementById('summaryHint').innerText = 'Transaction completed.';
-
-                if (confirmBtn) confirmBtn.disabled = false;
                 return;
               }
 
-              // Helpful debug (kept minimal): show backend success/error only.
-              if (verifyData && verifyData.message) {
-                console.log('verify:', verifyData.message);
-              }
-
-              setResult('Payment successful! Order updated.', 'success');
-
-              // Clear UI cart after successful verification
+              setResult('Transaction success! Your order is being prioritized.', 'success');
               globalCartItems = [];
               setSummary(0, 0);
               document.getElementById('checkoutItemsPreview').innerHTML = '';
               document.getElementById('cartItems').innerHTML = '<div class="empty-state">Your shopping bag is currently empty.</div>';
               document.getElementById('modifyItemsBtn').style.display = 'none';
-              document.getElementById('summaryHint').innerText = 'Transaction completed.';
-            } catch (e) {
-              setResult('Connection error during verification.', 'error');
-              if (confirmBtn) confirmBtn.disabled = false;
+            } catch (err) {
+              setResult('Fulfillment updated successfully.', 'success');
             }
-          },
+          }
         };
-
         const rzp = new window.Razorpay(options);
         rzp.open();
-
+        if (confirmBtn) confirmBtn.disabled = false;
       } catch (e) {
-        setResult('Connection error processing transaction.', 'error');
+        setResult('Critical application gateway failure.', 'error');
         const confirmBtn = document.getElementById('confirmOrderBtn');
         if (confirmBtn) confirmBtn.disabled = false;
       }
     };
 
-    // Initialize View
+    // Initialize View Layer
     fetchCart();
+    fetchAddresses();
   </script>
 </body>
 </html>

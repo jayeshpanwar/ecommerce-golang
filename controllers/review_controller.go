@@ -1,44 +1,44 @@
 package controllers
 
-// import (
-// 	"ecommerce/config"
+import (
+	"ecommerce/dto"
+	"ecommerce/services"
 
-// 	"github.com/gin-gonic/gin"
-// )
+	"github.com/gin-gonic/gin"
+)
 
-// func CreateReview(c *gin.Context) {
+func CreateReview(c *gin.Context) {
 
-// 	userID := c.MustGet("userID").(uint)
+	var request dto.CreateReviewRequest
 
-// 	var req CreateReviewRequest
-// 	_ = CreateReviewRequest{}
+	if err := c.ShouldBindJSON(&request); err != nil {
 
-// 	if err := c.ShouldBind(&req); err != nil {
-// 		c.JSON(400, gin.H{"error": err.Error()})
-// 		return
-// 	}
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
 
-// 	if req.Rating < 1 || req.Rating > 5 {
-// 		c.JSON(400, gin.H{
-// 			"message": "Rating must be between 1 and 5",
-// 		})
-// 		return
-// 	}
+		return
+	}
 
-// 	var count int64
+	userID := c.MustGet("userID").(uint)
 
-// 	config.DB.
-// 		Table("orders").
-// 		Joins("JOIN order_items ON order_items.order_id = orders.id").
-// 		Where("orders.user_id = ? AND order_items.product_id = ? AND orders.status = ?",
-// 			userID, req.ProductID, "delivered").
-// 		Count(&count)
+	review, err := services.CreateReview(userID, request)
 
-// 	if count == 0 {
-// 		c.JSON(403, gin.H{
-// 			"message": "You can only review purchased products",
-// 		})
-// 		return
-// 	}
+	if err != nil {
 
-//}
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	response := dto.BuildReviewResponse(*review)
+
+	c.JSON(201, gin.H{
+
+		"message": "Review created successfully",
+
+		"review": response,
+	})
+}

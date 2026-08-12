@@ -163,15 +163,12 @@
             <div id="categoryHint" class="helper-text" style="margin-top:8px; display:none;">Choose a category created by admin.</div>
           </div>
 
-
           <div class="input-group">
             <label for="image">Product Image</label>
             <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg" required />
           </div>
 
           <button type="submit" id="submitBtn">Publish Product</button>
-
-
         </form>
       </div>
 
@@ -200,6 +197,15 @@
             <label for="editDescription">Updated Description</label>
             <textarea id="editDescription" rows="3" placeholder="Leave empty if unchanged"></textarea>
           </div>
+
+          <div class="input-group">
+            <label for="edit_category_id">Category (optional)</label>
+            <select id="edit_category_id">
+              <option value="" selected>Leave empty to keep current category</option>
+            </select>
+            <div id="editCategoryHint" class="helper-text" style="margin-top:8px; display:none;">Choose a different category created by admin.</div>
+          </div>
+
           <button type="submit" id="submitBtn2" style="background: linear-gradient(90deg, var(--primary), #4f46e5)">Apply Modifications</button>
         </form>
       </div>
@@ -265,7 +271,6 @@
       el.innerText = message || '';
     }
 
-
     function logout(e) {
       if (e) e.preventDefault();
       localStorage.removeItem('token');
@@ -273,30 +278,122 @@
     }
 
     async function loadCategories() {
-      try {
-        const token = getToken();
-        if (!token) return;
+      const categorySelect = document.getElementById('category_id');
+      const editCategorySelect = document.getElementById('edit_category_id');
+      const addHint = document.getElementById('categoryHint');
+      const editHint = document.getElementById('editCategoryHint');
 
-        const categorySelect = document.getElementById('category_id');
-        const hint = document.getElementById('categoryHint');
-        if (!categorySelect) return;
+      if (!categorySelect && !editCategorySelect) return;
 
+      if (categorySelect) {
         categorySelect.innerHTML = `<option value="" selected disabled>Loading categories...</option>`;
-        if (hint) hint.style.display = 'none';
+      }
+      if (addHint) addHint.style.display = 'none';
 
-        // NOTE: Your current backend only has POST /admin/categories.
-        // If you add a GET endpoint later, this function can populate automatically.
-        // For now we keep the dropdown empty so seller must choose a valid category_id.
+      if (editCategorySelect) {
+        editCategorySelect.innerHTML = `<option value="" selected>Leave empty to keep current category</option>`;
+      }
+      if (editHint) editHint.style.display = 'none';
 
-        categorySelect.innerHTML = `<option value="" selected disabled>No categories endpoint found</option>`;
-        if (hint) {
-          hint.style.display = 'block';
-          hint.innerText = ' .';
+      const token = getToken();
+      if (!token) {
+        if (categorySelect) {
+          categorySelect.innerHTML = `<option value="" selected disabled>Please login to load categories</option>`;
         }
+        if (addHint) {
+          addHint.style.display = 'block';
+          addHint.innerText = 'Authentication token missing. Please login again.';
+        }
+        if (editHint) {
+          editHint.style.display = 'block';
+          editHint.innerText = 'Authentication token missing. Please login again.';
+        }
+        return;
+      }
+
+      let res;
+      let body;
+      try {
+        res = await fetch(`${API_BASE}/seller/categories`, {
+          method: 'GET',
+          headers: authHeadersWithoutContentType(),
+        });
+        body = await res.json().catch(() => ({}));
       } catch (e) {
-        // keep dropdown usable           
+        if (categorySelect) categorySelect.innerHTML = `<option value="" selected disabled>Network error</option>`;
+        if (addHint) {
+          addHint.style.display = 'block';
+          addHint.innerText = 'Could not fetch categories from the server.';
+        }
+        if (editHint) {
+          editHint.style.display = 'block';
+          editHint.innerText = 'Could not fetch categories from the server.';
+        }
+        return;
+      }
+
+      if (!res.ok) {
+        if (categorySelect) categorySelect.innerHTML = `<option value="" selected disabled>Failed to load categories</option>`;
+        if (addHint) {
+          addHint.style.display = 'block';
+          addHint.innerText = body?.message || body?.error || 'Request failed (' + res.status + ')';
+        }
+        if (editHint) {
+          editHint.style.display = 'block';
+          editHint.innerText = body?.message || body?.error || 'Request failed (' + res.status + ')';
+        }
+        console.error('loadCategories failed:', res.status, body);
+        return;
+      }
+
+      const categories = body?.data ?? body;
+
+      if (!Array.isArray(categories) || categories.length === 0) {
+        if (categorySelect) categorySelect.innerHTML = `<option value="" selected disabled>No categories available</option>`;
+        if (addHint) {
+          addHint.style.display = 'block';
+          addHint.innerText = 'Ask admin to create categories first.';
+        }
+        if (editHint) {
+          editHint.style.display = 'block';
+          editHint.innerText = 'Ask admin to create categories first.';
+        }
+        return;
+      }
+
+      const optionsHtml = categories
+        .map(c => {
+          const id = c.id ?? c.ID ?? c.CategoryID;
+          const name = c.name ?? c.Name;
+          if (id === undefined || name === undefined) return '';
+          return `<option value="${id}">${name}</option>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+      if (categorySelect) {
+        categorySelect.innerHTML = `<option value="" disabled>Select a category</option>${optionsHtml}`;
+      }
+      if (addHint) {
+        addHint.style.display = 'block';
+        addHint.innerText = 'Choose a category created by admin.';
+      }
+
+      if (editCategorySelect) {
+        editCategorySelect.innerHTML = `<option value="" selected>Leave empty to keep current category</option>${optionsHtml}`;
+      }
+      if (editHint) {
+        editHint.style.display = 'block';
+        editHint.innerText = 'Choose a different category created by admin.';
       }
     }
+
+
+
+
+
+
+
 
     async function createProduct() {
       try {
@@ -324,7 +421,6 @@
         formData.append('category_id', categoryId);
         formData.append('image', file);
 
-
         const res = await fetch(`${API_BASE}/seller/products`, {
           method: 'POST',
           headers: authHeadersWithoutContentType(),
@@ -343,88 +439,64 @@
       } catch { setResult('Network connection error.', 'error'); }
     }
 
-
     async function updateProduct() {
       try {
-        const token = getToken();
-        if (!token) { setResult('Authentication expired.', 'error'); return; }
-
-        const role = parseRoleFromToken(token);
-
-        if (role !== 'seller') {
-          setResult('Forbidden: your account is not a seller (JWT role mismatch).', 'error');
-          return;
-        }
+        if (!getToken()) { setResult('Authentication expired.', 'error'); return; }
 
         const id = Number(document.getElementById('editId').value);
-        const input = {};
+        if (!id || id < 1) { setResult('Please enter a valid product ID.', 'error'); return; }
 
         const name = document.getElementById('editName').value.trim();
         const priceRaw = document.getElementById('editPrice').value;
         const stockRaw = document.getElementById('editStock').value;
-        const desc = document.getElementById('editDescription').value.trim();
+        const description = document.getElementById('editDescription').value.trim();
+        const categoryIdRaw = document.getElementById('edit_category_id').value;
 
-        if (name) input.name = name;
-        if (priceRaw !== '') input.price = Number(priceRaw);
-        if (stockRaw !== '') input.stock = Number(stockRaw);
-        if (desc) input.description = desc;
+        const payload = {};
 
-        if (!id || Number.isNaN(id)) {
-          setResult('Invalid product ID.', 'error');
+        if (name) payload.name = name;
+        if (priceRaw !== '' && priceRaw !== null && priceRaw !== undefined) payload.price = Number(priceRaw);
+        if (stockRaw !== '' && stockRaw !== null && stockRaw !== undefined) payload.stock = Number(stockRaw);
+        if (description) payload.description = description;
+        if (categoryIdRaw !== '' && categoryIdRaw !== null && categoryIdRaw !== undefined) {
+          payload.category_id = Number(categoryIdRaw);
+        }
+
+        // If nothing to update
+        if (Object.keys(payload).length === 0) {
+          setResult('No changes detected. Provide at least one field to update.', 'error');
           return;
         }
 
-        console.log('updateProduct PUT', `${API_BASE}/seller/products/${id}`, input);
-        const res = await fetch(
+        const res = await fetch(`${API_BASE}/seller/products/${id}`, {
+          method: 'PUT',
+          headers: {
+            ...authHeadersWithoutContentType(),
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
 
-          `${API_BASE}/seller/products/${id}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify(input),
-          }
-        );
+        const data = await res.json().catch(() => ({}));
 
+        if (!res.ok) { setResult(data.message || data.error || 'Failed to update product', 'error'); return; }
 
+        setResult(data.message || 'Product updated successfully.', 'success');
 
-        let data = {};
-        try {
-          data = await res.json();
-        } catch (_) {
-          // fallback to text so we don't mask backend errors as "network" failures
-        }
-
-        if (!res.ok) {
-          let extra = '';
-          if (!data || typeof data !== 'object') data = {};
-          if (!data.message && !data.error) {
-            // try once more to read body as text for better debugging
-            try {
-              const text = await res.text();
-              extra = text ? ` - ${text}` : '';
-            } catch (_) {}
-          }
-
-          setResult(
-            `Update failed (${res.status}): ${data.message || data.error || 'unknown error'}${extra}`,
-            'error'
-          );
-          return;
-        }
-
-        setResult(data.message || 'Product modified successfully.', 'success');
-        document.getElementById('editId').value = '';
+        // Do not clear editId, but clear fields (optional)
+        // Only clear fields that were edit inputs
         document.getElementById('editName').value = '';
         document.getElementById('editPrice').value = '';
         document.getElementById('editStock').value = '';
         document.getElementById('editDescription').value = '';
+        document.getElementById('edit_category_id').value = '';
       } catch (e) {
         setResult(`Network transaction failure: ${e?.message || 'unknown error'}`, 'error');
       }
     }
+
+
+
 
 
     async function deleteProduct() {

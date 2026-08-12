@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"ecommerce/config"
+	"ecommerce/dto"
 	"ecommerce/models"
 	"ecommerce/services"
 	"ecommerce/utils"
@@ -79,9 +80,18 @@ func Checkout(c *gin.Context) {
 		"items":        items,
 		"total_amount": total,
 	})
+
 }
 
 func CreateOrder(c *gin.Context) {
+
+	var req dto.CreateOrderRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request"})
+		return
+	}
+
 	userID := c.MustGet("userID").(uint)
 
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
@@ -127,9 +137,14 @@ func CreateOrder(c *gin.Context) {
 			total += product.Price * float64(item.Quantity)
 		}
 
+		PaymentMethod := req.PaymentMethod
+		AddressID := req.AddressID
+
 		order := models.Order{UserID: userID,
 			TotalAmount:   total,
 			Status:        "pending",
+			AddressID:     AddressID,
+			PaymentMethod: PaymentMethod,
 			PaymentStatus: "pending",
 		}
 		if err := tx.Create(&order).Error; err != nil {
@@ -203,6 +218,8 @@ func ViewOrders(c *gin.Context) {
 	userID := c.MustGet("userID").(uint)
 
 	type OrderItemResponse struct {
+		OrderItemID uint    `json:"order_item_id"`
+		OrderID     uint    `json:"order_id"`
 		ProductID   uint    `json:"product_id"`
 		ProductName string  `json:"product_name"`
 		Price       float64 `json:"price"`
@@ -237,12 +254,15 @@ func ViewOrders(c *gin.Context) {
 		for _, item := range order.OrderItems {
 
 			items = append(items, OrderItemResponse{
+				OrderItemID: item.ID,
+				OrderID:     item.OrderID,
 				ProductID:   item.ProductID,
 				ProductName: item.Product.Name,
 				Price:       item.Price,
 				Quantity:    item.Quantity,
 				Status:      item.Status,
 			})
+
 		}
 
 		response = append(response, OrderResponse{

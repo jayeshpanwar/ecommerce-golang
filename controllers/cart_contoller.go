@@ -3,7 +3,9 @@ package controllers
 import (
 	"ecommerce/config"
 	"ecommerce/models"
+	"ecommerce/services"
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -109,39 +111,21 @@ func AddToCart(c *gin.Context) {
 
 }
 
-//---------------------------DELETE SPECIFIC ITEM FROM CART--------------------------------------------------------
-
+// ---------------------------DELETE SPECIFIC ITEM FROM CART--------------------------------------------------------
 func DeleteFromCart(c *gin.Context) {
 
 	cartItemID := c.Param("id")
 	userID := c.MustGet("userID").(uint)
 
-	var cart models.Cart
-
-	if err := config.DB.Where("user_id=?", userID).First(&cart).Error; err != nil {
-		c.JSON(400, gin.H{
-			"message": "Cart not found",
-		})
-		return
-	}
-
-	var cartItem models.CartItem
-
-	if err := config.DB.Where("id=? AND cart_id=?", cartItemID, cart.ID).First(&cartItem).Error; err != nil {
-		c.JSON(400, gin.H{
-			"message": "Cart item not found",
-		})
-		return
-	}
-
-	if err := config.DB.Delete(&cartItem).Error; err != nil {
-		c.JSON(500, gin.H{
+	err := services.DeleteFromCart(userID, cartItemID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Cart item deleted",
 	})
 }
@@ -151,66 +135,15 @@ func ViewCart(c *gin.Context) {
 
 	userID := c.MustGet("userID").(uint)
 
-	var cart models.Cart
-
-	if err := config.DB.Where("user_id=?", userID).First(&cart).Error; err != nil {
+	response, err := services.ViewCart(userID)
+	if err != nil {
 		c.JSON(400, gin.H{
 			"message": "Cart not found",
 		})
 		return
 	}
 
-	var cartItems []models.CartItem
-
-	if err := config.DB.
-		Where("cart_id = ?", cart.ID).
-		Find(&cartItems).Error; err != nil {
-
-		c.JSON(500, gin.H{
-			"error": err.Error(),
-		})
-
-		return
-	}
-
-	type CartItemResponse struct {
-		CartItemID  uint    `json:"cart_item_id"`
-		ProductID   uint    `json:"product_id"`
-		ProductName string  `json:"product_name"`
-		Price       float64 `json:"price"`
-		Quantity    uint    `json:"quantity"`
-	}
-
-	var response []CartItemResponse
-
-	for _, item := range cartItems {
-
-		var product models.Product
-
-		if err := config.DB.
-			First(&product, item.ProductID).
-			Error; err != nil {
-
-			continue
-		}
-
-		response = append(
-			response,
-			CartItemResponse{
-
-				CartItemID:  item.ID,
-				ProductID:   product.ID,
-				ProductName: product.Name,
-				Price:       product.Price,
-				Quantity:    item.Quantity,
-			},
-		)
-	}
-
-	c.JSON(200, gin.H{
-		"cart_id": cart.ID,
-		"items":   response,
-	})
+	c.JSON(200, response)
 }
 
 // /-------------------------DECREASE QUANTITY OF ITEM IN CART--------------------------------------------------------
@@ -239,8 +172,6 @@ func DecreaseCartItemQuantity(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Println("Found Cart Item:", cartItem)
-	fmt.Println("Quantity:", cartItem.Quantity)
 
 	if cartItem.Quantity > 1 {
 		cartItem.Quantity -= 1
@@ -254,7 +185,7 @@ func DecreaseCartItemQuantity(c *gin.Context) {
 			"message": "Cart item quantity decreased",
 			"cart":    cartItem,
 		})
-	} else {
+	} else if cartItem.Quantity == 1 {
 		if err := config.DB.Delete(&cartItem).Error; err != nil {
 			c.JSON(500, gin.H{
 				"error": err.Error(),
