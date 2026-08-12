@@ -32,6 +32,7 @@ func SetupRoutes(router *gin.Engine) {
 		seller.PUT("/orders/:id/reject", controllers.RejectOrder)
 		seller.PUT("/orders/:id/ship", controllers.ShipOrder)
 		seller.PUT("/orders/:id/deliver", controllers.DeliverOrder)
+		seller.GET("/categories", controllers.GetCategories)
 	}
 
 	// Admin Routes
@@ -70,6 +71,16 @@ func SetupRoutes(router *gin.Engine) {
 		user.GET("/orders/:id/payments", controllers.GetPaymentDetails)
 		user.GET("/orders/:id/tracking", controllers.GetOrderTracking)
 		user.POST("/payment/COD/:order_id", controllers.PlaceCODOrder)
+		user.POST("/addresses", controllers.AddAddress)
+		user.GET("/addresses", controllers.GetAddresses)
+		user.GET("/products/category/:id", controllers.GetProductsByCategory)
+		user.GET("/products/search", controllers.SearchProducts)
+		user.POST("/reviews", controllers.CreateReview)
+		//user.GET("/products/:id/reviews", controllers.GetProductReviews)
+
+		// user.GET("/addresses/:id", controllers.GetAddressByID)
+		// user.PUT("/addresses/:id", controllers.UpdateAddress)
+		// user.DELETE("/addresses/:id", controllers.DeleteAddress)
 
 		//user.POST("/reviews", controllers.CreateReview)
 

@@ -20,8 +20,6 @@ func main() {
 		&models.OrderItem{},
 		&models.Cart{},
 		&models.CartItem{},
-		&models.Review{},
-		&models.ReviewImage{},
 		&models.OrderStatusHistory{},
 	)
 	if err != nil {

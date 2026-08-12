@@ -11,8 +11,9 @@
     /* Lighten the background for an e-commerce feel */
     body {
       background-color: #f1f3f6; /* Classic Flipkart/Amazon light gray background */
-      color: #212121;
+      color: #0b0202;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
     }
     
     .ambient-bg {
@@ -21,16 +22,160 @@
 
     /* Navbar light theme adjustments */
     .navbar {
-      background-color: #ffffff;
+      background-color: hsl(0, 0%, 100%);
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       padding: 12px 24px;
     }
     
     .nav-brand-name {
-      color: #2874f0; /* Flipkart Blue */
+      color: #5a28f0; /* Flipkart Blue */
       font-weight: bold;
       font-size: 1.4rem;
     }
+
+    /* --- Category Scroller Section Styles (Screenshot Inspired) --- */
+    .category-section-wrapper {
+      background: #ffffff;
+      padding: 16px 0;
+      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .category-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 64px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .category-scroller {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      width: 100%;
+      padding: 4px 4px 12px 4px;
+    }
+
+    /* Hide scrollbar for clean visual appearance */
+    .category-scroller::-webkit-scrollbar {
+      display: none;
+    }
+    .category-scroller {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    .category-card {
+      flex: 0 0 calc(20% - 15px);
+      min-width: 170px;
+      background: #f0efff;
+      border: 1px solid #dcd9ff;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+
+    /* Wavy/curved ambient bottom visual placeholder wrapper */
+    .category-image-pane {
+      width: 100%;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: #f0efff;
+      border-radius: 16px 16px 0 0;
+    }
+
+    /* Simulates the subtle background curve drop from the reference image */
+    .category-image-pane::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: #ffffff;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      transform: scaleX(1.3);
+      z-index: 1;
+    }
+
+    .category-icon-placeholder {
+      font-size: 3rem;
+      z-index: 2;
+      transition: transform 0.3s ease;
+    }
+
+    .category-card:hover .category-icon-placeholder {
+      transform: scale(1.08);
+    }
+
+    .category-footer-label {
+      width: 100%;
+      background: #5e35b1; /* Vibrant Purple Label Block */
+      color: #ffffff;
+      text-align: center;
+      padding: 12px 4px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      box-sizing: border-box;
+    }
+/* 2. Position the arrows in the blank space, away from the cards */
+    .scroller-arrow-left {
+      left: 8px; /* Pulls the arrow firmly into the left blank space */
+    }
+
+    .scroller-arrow-right {
+      right: 8px; /* Pulls the arrow firmly into the right blank space */
+    }
+
+    /* 3. Minimalist standalone arrow styling (No circle) */
+    .scroller-arrow-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 50;
+      background: transparent; /* Removes white background */
+      border: none;            /* Removes the border */
+      box-shadow: none;        /* Removes the drop shadow */
+      padding: 10px;           /* Invisible padding makes it easy to click */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #5e35b1;          /* Vibrant purple arrow color */
+      font-size: 2.5rem;       /* Increased size so the bare arrow stands out */
+      font-weight: bold;
+      line-height: 1;
+      transition: color 0.2s ease, transform 0.2s ease;
+      user-select: none;
+    }
+
+    /* Clean hover effect for bare arrows */
+    .scroller-arrow-btn:hover {
+      color: #311b5e;          /* Darkens the arrow color slightly on hover */
+      transform: translateY(-50%) scale(1.15); /* Slight pop/zoom effect on hover */
+      background: transparent; 
+      box-shadow: none;
+    }
+    /* --- End of Category Section Styles --- */
 
     .storefront-header h2 {
       color: #212121;
@@ -38,7 +183,7 @@
     }
     
     .brand-subtitle {
-      color: #878787;
+      color: #4e19c0;
     }
 
     .marketplace-grid {
@@ -133,7 +278,7 @@
     }
     
     .custom-stars {
-      color: #ff9f00; /* Marketplace yellow/gold */
+      color: #ffbf00; /* Marketplace yellow/gold */
       font-size: 1rem;
     }
 
@@ -179,7 +324,7 @@
     .custom-submit-btn {
       width: 100%;
       padding: 10px;
-      background: #ff9f00; /* Flipkart Orange / Amazon Yellow-Orange vibe */
+      background: #8147ef; /* Flipkart Orange / Amazon Yellow-Orange vibe */
       border: none;
       border-radius: 4px;
       color: #ffffff;
@@ -194,7 +339,7 @@
     }
 
     .custom-submit-btn:hover:not(:disabled) {
-      background: #f39500;
+      background: #7602fa;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
@@ -243,7 +388,10 @@
         <span class="nav-brand-name">ShopSphere</span>
       </div>
 
-      <div class="nav-actions">
+      <div class="nav-actions" style="flex-direction:column; align-items:flex-end; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px; width:100%; justify-content:flex-end;">
+  
+          </button>
         <button type="button" class="nav-btn secondary-btn" onclick="window.location.href='orders.html'" style="color:#212121;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.793 1.993 1.821m-9.3 15.39c-1.118-.094-1.964-1.057-1.964-2.192V6.108c0-1.135.846-2.098 1.964-2.192m11.123 18V21a3 3 0 0 0-3-3H9.75a3 3 0 0 0-3 3v.75m11.25 0v-4.66a2.25 2.25 0 0 0-.659-1.591L15 14.25M9.75 21v-4.66a2.25 2.25 0 0 1 .659-1.591L12 14.25" /></svg>
           <span>My Orders</span>
@@ -257,19 +405,125 @@
     </div>
   </nav>
 
+  <section class="category-section-wrapper">
+    <div class="category-container">
+      <button
+        class="scroller-arrow-btn scroller-arrow-left"
+        onclick="document.getElementById('categoryScroller').scrollBy({left: -200, behavior: 'smooth'})"
+        aria-label="Previous Categories">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 4.5-7.5 7.5 7.5 7.5" />
+        </svg>
+      </button>
+
+      <div class="category-scroller" id="categoryScroller">
+        
+        <div class="category-card" data-category-id="1" onclick="selectCategory(1)" style="outline: 2px solid #2874f0; outline-offset: 2px;">
+
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">🎧</span>
+          </div>
+          <div class="category-footer-label">Electronics</div>
+        </div>
+
+        <div class="category-card" data-category-id="2" onclick="selectCategory(2)">
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">👗</span>
+          </div>
+          <div class="category-footer-label">Fashion</div>
+        </div>
+
+        <div class="category-card" data-category-id="3" onclick="selectCategory(3)">
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">📚</span>
+          </div>
+          <div class="category-footer-label">Books</div>
+        </div>
+
+        <div class="category-card" data-category-id="4" onclick="selectCategory(4)">
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">🛋️</span>
+          </div>
+          <div class="category-footer-label">Furniture</div>
+        </div>
+
+        <div class="category-card" data-category-id="5" onclick="selectCategory(5)">
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">👟</span>
+          </div>
+          <div class="category-footer-label">Footwears</div>
+        </div>
+
+        <div class="category-card" data-category-id="6" onclick="selectCategory(6)">
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">✏️</span>
+          </div>
+          <div class="category-footer-label">Stationary</div>
+        </div>
+
+        <div class="category-card" data-category-id="7" onclick="selectCategory(7)">
+          <div class="category-image-pane">
+            <span class="category-icon-placeholder">🧸</span>
+          </div>
+          <div class="category-footer-label">Toys</div>
+        </div>
+
+      </div>
+
+      <!-- Right arrow -->
+      <button
+        class="scroller-arrow-btn scroller-arrow-right"
+        onclick="document.getElementById('categoryScroller').scrollBy({left: 200, behavior: 'smooth'})"
+        aria-label="Next Categories">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+    </div>
+  </section>
   <main class="storefront-container" style="max-width: 1200px; margin: 0 auto; padding: 24px;">
-    <div class="storefront-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <div>
+    <div class="storefront-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:16px; flex-wrap:wrap;">
+      <div style="min-width:260px;">
         <h2 style="margin:0; font-size:1.5rem;">Trending Catalog</h2>
         <p class="brand-subtitle" style="margin:4px 0 0 0; font-size:0.9rem;">Explore top-tier verified items active on the network.</p>
       </div>
-      <div class="logout-wrapper">
-        <a href="login.html" onclick="logout(event)" class="logout-link" style="display:flex; align-items:center; gap:4px; color:#d32f2f; text-decoration:none; font-weight:500;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
-          <span>Logout</span>
-        </a>
+
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search products..."
+            style="width:320px; max-width:70vw; padding:10px 12px; border-radius:8px; border:1px solid #e0e0e0; background:#ffffff; color:#212121; outline:none;"
+            onkeydown="if(event.key==='Enter'){ applySearch(); }"
+          />
+          <button
+            id="searchBtn"
+            type="button"
+            onclick="applySearch()"
+            style="padding:10px 14px; background:#0a0110; color:#d6d0da; border:none; border-radius:8px; font-weight:700;"
+          >
+            Search
+          </button>
+          <button
+            id="clearSearchBtn"
+            type="button"
+            onclick="clearSearch()"
+            style="padding:10px 12px; background:#ffffff; color:#212121; border:1px solid #e0e0e0; border-radius:8px; font-weight:700;"
+          >
+            Clear
+          </button>
+        </div>
+
+        <div class="logout-wrapper">
+          <a href="login.html" onclick="logout(event)" class="logout-link" style="display:flex; align-items:center; gap:4px; color:#d32f2f; text-decoration:none; font-weight:500;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
+            <span>Logout</span>
+          </a>
+        </div>
       </div>
     </div>
+
 
     <p id="result" class="result" aria-live="polite"></p>
 
@@ -288,6 +542,49 @@
     const API_BASE = 'http://localhost:8080';
 
     function getToken() { return localStorage.getItem('token'); }
+
+    function wireCategoryScrollerGestures() {
+      const scroller = document.getElementById('categoryScroller');
+      if (!scroller) return;
+
+      let isDragging = false;
+      let startX = 0;
+      let startScrollLeft = 0;
+
+      const onPointerDown = (e) => {
+        // Only left click / primary touch
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+        // If user taps/clicks an actual category card, don't start drag
+        // (so category click handlers still fire)
+        const card = e.target && e.target.closest ? e.target.closest('.category-card') : null;
+        if (card) return;
+
+        isDragging = true;
+        scroller.setPointerCapture?.(e.pointerId);
+        startX = e.clientX;
+        startScrollLeft = scroller.scrollLeft;
+      };
+
+
+      const onPointerMove = (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        scroller.scrollLeft = startScrollLeft - dx;
+      };
+
+      const endDrag = () => {
+        isDragging = false;
+      };
+
+      // Use pointer events for both mouse + touch
+      scroller.addEventListener('pointerdown', onPointerDown);
+      scroller.addEventListener('pointermove', onPointerMove);
+      scroller.addEventListener('pointerup', endDrag);
+      scroller.addEventListener('pointercancel', endDrag);
+      scroller.addEventListener('mouseleave', endDrag);
+    }
+
     function authHeaders() {
       const token = getToken();
       return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
@@ -322,16 +619,38 @@
     let totalPages = 1;
     const pageSize = 10;
 
+    // When user clicks a category, we load only that category's products.
+    // null => all products.
+    let selectedCategoryId = null;
+
+    // Search state
+    let searchQuery = '';
+    let isSearchMode = false;
+
+
+
     function updatePaginationUI() {
       const prevBtn = document.getElementById('prevPageBtn');
       const nextBtn = document.getElementById('nextPageBtn');
       const info = document.getElementById('paginationInfo');
 
+      const isCategoryMode = !isSearchMode && selectedCategoryId !== null;
+      const isPaginationSearchMode = isSearchMode;
+
       if (prevBtn) prevBtn.disabled = currentPage <= 1;
       if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
 
-      if (info) info.innerText = `Page ${currentPage} of ${totalPages}`;
+      if (info) {
+        info.innerText = isPaginationSearchMode
+          ? `Search Page ${currentPage} of ${totalPages}`
+          : isCategoryMode
+            ? `Category Page ${currentPage} of ${totalPages}`
+            : `Page ${currentPage} of ${totalPages}`;
+      }
+
     }
+
+
 
     function changePage(delta) {
       const newPage = currentPage + delta;
@@ -340,6 +659,69 @@
       currentPage = newPage;
       fetchProducts();
     }
+
+    // Search
+    function applySearch() {
+      const input = document.getElementById('searchInput');
+      const q = (input ? input.value : '').trim();
+
+      searchQuery = q;
+      isSearchMode = searchQuery.length > 0;
+
+      // Search takes priority; clear category selection.
+      selectedCategoryId = null;
+      currentPage = 1;
+
+      // Clear category highlight if any.
+      document.querySelectorAll('.category-card').forEach(el => {
+        el.style.outline = '';
+        el.style.boxShadow = '';
+      });
+
+      fetchProducts();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      if (input) input.value = '';
+
+      searchQuery = '';
+      isSearchMode = false;
+
+      currentPage = 1;
+      selectedCategoryId = null;
+
+      document.querySelectorAll('.category-card').forEach(el => {
+        el.style.outline = '';
+        el.style.boxShadow = '';
+      });
+
+      fetchProducts();
+    }
+
+    // Load products filtered by category (null => all products)
+    function selectCategory(categoryId) {
+      // Category selection is ignored while searching.
+      if (isSearchMode) return;
+
+      selectedCategoryId = categoryId ? Number(categoryId) : null;
+      currentPage = 1;
+      fetchProducts();
+
+
+
+      // Optional: highlight selected category card
+      document.querySelectorAll('.category-card').forEach(el => {
+        el.style.outline = '';
+        el.style.boxShadow = '';
+      });
+      const active = document.querySelector(`.category-card[data-category-id="${selectedCategoryId}"]`);
+      if (active) {
+        active.style.outline = '2px solid #2874f0';
+        active.style.outlineOffset = '2px';
+      }
+    }
+
 
     async function fetchProducts() {
       try {
@@ -353,10 +735,28 @@
 
         setLoading(true);
 
-        const res = await fetch(
-          `${API_BASE}/products?page=${encodeURIComponent(currentPage)}&limit=${encodeURIComponent(pageSize)}`,
-          { method: 'GET', headers: authHeaders() },
-        );
+        // Load products based on current mode.
+        // Priority: search > category > all
+        // Backend endpoints:
+        //  - GET /products/search?q=...&page=&limit=
+        //  - GET /products/category/:category_id?page=&limit=
+        //  - GET /products?page=&limit=
+        const res = isSearchMode
+          ? await fetch(
+              `${API_BASE}/products/search?q=${encodeURIComponent(searchQuery)}&page=${encodeURIComponent(currentPage)}&limit=${encodeURIComponent(pageSize)}`,
+              { method: 'GET', headers: authHeaders() },
+            )
+          : selectedCategoryId
+            ? await fetch(
+                `${API_BASE}/products/category/${encodeURIComponent(selectedCategoryId)}?page=${encodeURIComponent(currentPage)}&limit=${encodeURIComponent(pageSize)}`,
+                { method: 'GET', headers: authHeaders() },
+              )
+            : await fetch(
+                `${API_BASE}/products?page=${encodeURIComponent(currentPage)}&limit=${encodeURIComponent(pageSize)}`,
+                { method: 'GET', headers: authHeaders() },
+              );
+
+
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
@@ -366,8 +766,19 @@
         }
 
         const products = data.products || data.data || data || [];
-        totalPages = Number(data.totalPages ?? totalPages ?? 1);
-        if (!Number.isFinite(totalPages) || totalPages < 1) totalPages = 1;
+
+        if (isSearchMode) {
+          const total = Number(data.total ?? 0);
+          totalPages = total > 0 ? Math.ceil(total / pageSize) : 1;
+        } else if (selectedCategoryId) {
+          const total = Number(data.total ?? 0);
+          totalPages = total > 0 ? Math.ceil(total / pageSize) : 1;
+        } else {
+          totalPages = Number(data.totalPages ?? totalPages ?? 1);
+          if (!Number.isFinite(totalPages) || totalPages < 1) totalPages = 1;
+        }
+
+
 
         updatePaginationUI();
 
@@ -429,8 +840,8 @@
                 ${stockStatusMarkup}
 
                 <div class="custom-pricing-row">
-                  <span class="custom-price-val">$${price.toFixed(2)}</span>
-                  <span class="custom-price-strike">$${fakeOriginalPrice}</span>
+                  <span class="custom-price-val">₹${price.toFixed(2)}</span>
+                  <span class="custom-price-strike">₹${fakeOriginalPrice}</span>
                 </div>
 
                 <div class="custom-actions-wrapper">
@@ -494,11 +905,26 @@
     }
 
     fetchProducts();
+    wireCategoryScrollerGestures();
+
+    // Ensure arrows are vertically centered and above content
+    (function ensureArrowZIndex() {
+      const left = document.querySelector('.scroller-arrow-left');
+      const right = document.querySelector('.scroller-arrow-right');
+      [left, right].forEach(btn => {
+        if (!btn) return;
+        btn.style.zIndex = '50';
+      });
+    })();
+
     window.addToCart = addToCart;
     window.openProductDetails = openProductDetails;
     window.logout = logout;
     window.changePage = changePage;
+    window.applySearch = applySearch;
+    window.clearSearch = clearSearch;
+
   </script>
+
 </body>
 </html>
-

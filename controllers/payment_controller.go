@@ -11,13 +11,18 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreatePaymentOrder(c *gin.Context) {
 
-	orderID := c.Param("order_id")
+	orderID, err := strconv.Atoi(c.Param("order_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid order id"})
+		return
+	}
 	userID := c.MustGet("userID").(uint)
 
 	var order models.Order
